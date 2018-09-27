@@ -1,0 +1,4 @@
+﻿  323 Project.cpp
+c:\users\td061\source\repos\323 project\323 project\language.h(24): warning C4018: '<': signed/unsigned mismatch
+c:\users\td061\source\repos\323 project\323 project\language.h(34): warning C4018: '<': signed/unsigned mismatch
+  323 Project.vcxproj -> c:\users\td061\source\repos\323 Project\Debug\323 Project.exe
