@@ -1,0 +1,19 @@
+!the following is a rat18S sample  !
+
+function add [first: real second:real] {
+    return (real + real);
+
+function subtract [first:real , second: real){
+    return (real - real);
+}
+
+%% 
+
+
+real first, second;
+! call functions!
+get(first,second);
+real total;
+
+add(first,second);
+subtract(first-second);

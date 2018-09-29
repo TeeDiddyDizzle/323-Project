@@ -119,7 +119,9 @@ Token tokenFromFSM(string token) {
 				curState = EndState;
 			}
 			break;
-		default:
+		case NumberConsume:
+		case IdentifierConsume:
+		case RealConsume:
 			tokenOut.val += curChar;
 			curCharIdx++;
 			break;
