@@ -52,7 +52,7 @@ State fsmStates[9][5] = {
 		{ IdentifierConsume,	NumberConsume,		ErrorState,		ErrorState,			ErrorState },		// Initial
 
 		{ IdentifierConsume,	ErrorState,			ErrorState,		ErrorState,			ErrorState },		// IdentifierStart
-		{ IdentifierConsume,	IdentifierConsume,	ErrorState,		IdentifierEnd,		IdentifierEnd },	// IdentifierConsume
+		{ IdentifierConsume,	IdentifierConsume,	ErrorState,		IdentifierConsume,	IdentifierEnd },	// IdentifierConsume
 		{ EndState,				EndState,			EndState,		EndState,			EndState },			// IdentifierEnd
 
 		{ ErrorState,			NumberConsume,		ErrorState,		ErrorState,			IntegerEnd },		// Number
@@ -89,10 +89,9 @@ Token tokenFromFSM(string token) {
 
 		switch (curState) {
 		case IdentifierEnd:
-			tokenOut.val += curChar;
 			tokenOut.type = Identifier;
 			
-			if (isdigit(tokenOut.val[tokenOut.val.length() - 2])) {
+			if (isdigit(tokenOut.val[tokenOut.val.size() - 1])) {
 				cout << "Identifier must end with letter or number: " << tokenOut.val << endl;
 				tokenOut.type = Error;
 				exit(-1);
@@ -104,15 +103,13 @@ Token tokenFromFSM(string token) {
 			break;
 		case IntegerEnd:
 			tokenOut.type = Integer;
-			tokenOut.val += curChar;
 			tokenOut.intVal = atoi(tokenOut.val.data());
 			curState = EndState;
 			break;
 		case RealEnd:
 			tokenOut.type = Real;
-			tokenOut.val += curChar;
 
-			if (tokenOut.val[tokenOut.val.length() - 2] == '.') {
+			if (tokenOut.val[tokenOut.val.length() - 1] == '.') {
 				cout << "Error parsing token: " << tokenOut.val << endl;
 				tokenOut.type = Error;
 				exit(-1);

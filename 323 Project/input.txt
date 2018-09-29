@@ -1,12 +1,8 @@
-function convert$ [fahr:int]
-{
-return 5 * (fahr -32) / 9;
+function doSomeMath$ [] {
+	return 5 + 10 - 20 * 30 + 33.3 - 20.0;
 }
 %%
-int low, high, step$; ! declarations !
-get (low, high, step$);
-while (low &lt; high )
-{ put (low);
-put (convert$ (low));
-low = low + step$;
+int num1$, num2$;
+while (num < 20) {
+	num = num + doSomeMath()
 }
