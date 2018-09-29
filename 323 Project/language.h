@@ -7,121 +7,117 @@ using namespace std;
 
 bool isOperator(string);
 bool isSeparator(string);
-TokenType otherToken(string);
+Token tokenFromFSM(string);
 
 std::vector<string> keywords = { "int", "boolean", "real", "function", "if", "endif", "else", "return", "put", "get", "while" };
-std::vector<string> separators = { "(", ")", "{", "}", "[", "]", ":", ";", "%%", "," };
+std::vector<string> separators = { "(", ")", "{", "}", "[", "]", ":", ";", "%%", ",", "!"};
 std::vector<string> operators = { "=<", "=>", "<", ">", "^=", "==", "=", "*", "/", "+", "-" };
-
-bool isKeyword(string input) {
-	return std::count(keywords.begin(), keywords.end(), input) > 0;
-}
 
 bool isWhitespace(char curChar) {
 	return curChar == ' ' || curChar == '\t' || curChar == '\r' || curChar == '\n';
 }
 
+bool isKeyword(string input) {
+	return std::count(keywords.begin(), keywords.end(), input) > 0;
+}
+
 bool isOperator(string token) {
-	bool isOp = false;
-	for (int i = 0; i < operators.size(); i++) {
-		if (token == operators[i]) {
-			isOp = true;
-		}
-	}
-	return isOp;
+	return std::count(operators.begin(), operators.end(), token) > 0;
 }
 
 bool isSeparator(string token) {
-	bool isSep = false;
-	for (int i = 0; i < separators.size(); i++) {
-		if (token == separators[i]) {
-			isSep = true;
-		}
-	}
-	return isSep;
+	return std::count(separators.begin(), separators.end(), token) > 0;
 }
-#endif
 
-TokenType type[10][5] = {
-	//	A-Za-z			0-9				.				$				Whitespace
-		IdentStart,		Number,			Error,			Error,			Error,				//Initial
-		IdentConsume,	Error,			Error,			Error,			Error,				//IdentStart
-		IdentConsume,	IdentConsume,	Error,			IdentConsume,	Identifier,			//IdentConsume
-		Error,			Error,			Error,			Error,			Error,				//DollarSign
-		Identifier,		Identifier,		Identifier,		Identifier,		Identifier,			//Identifier
-		Error,			NumberConsume,	Error,			Error,			Integer,			//Number
-		Error,			NumberConsume,	RealConsume,	Error,			Integer,			//NumberConsume
-		Error,			NumberConsume,	Error,			Error,			Real,				//RealConsume
-		Integer,		Integer,		Integer,		Integer,		Integer,			//Integer
-		Real,			Real,			Real,			Real,			Real,				//Real
+enum State {
+	Initial,
+	
+	IdentifierStart,
+	IdentifierConsume,
+	IdentifierEnd,
+
+	Number,
+	NumberConsume,
+	RealConsume,
+	IntegerEnd,
+	RealEnd,
+
+	EndState,
+	ErrorState
 };
 
-TokenType otherToken(string token) {
-	bool isIdent = false, isInt = false, isReal = false;
-	//TokenType type[11][5] = { space };
-	//TokenType type = space;
-	int i, j;
-	if (isalpha(token[0])) {		//IdentStart 
-		i = 2;						//IdentConsume
-		j = 0;
-		for (int a = 1; a < token.length(); a++) {
-			
-			if (i == 3 || i == 2) {
-				if (a == token.length() - 1) {
-					i = 4;			//Identifier
-					return type[i][j];	//
-				}
-				else if (i == 3 && a != token.length() - 1) {
-					return Error;
-				}
-			}
-			
-			if (isalnum(token[a])) {
-				i = 2;				//IdentConsume
-				if (isalpha(token[a])) {
-					j = 0;			//A-Za-z
-				}
-				else {
-					j = 1;			//0-9
-				}
-			}
-			else if (token[a] == '$') {
-				i = 3;				//DollarSign
-				j = 3;				//$
-			}
-		}
-	}
-	else if (isdigit(token[0])) {	//number
-		i = 6;						//NumberConsume
-		j = 1;
-		for (int a = 1; a < token.length(); a++) {
-			
-			if (i == 6 && a == token.length()-1 && isdigit(token[a])) {
-				i = 8;
-				j = 1;
-				return type[i][j];
-			}
-			else if (i == 7 && a == token.length()-1 && isdigit(token[a])) {
-				i = 9;
-				j = 1;
-				return type[i][j];
-			}
-			else if (a == token.length()-1 && !isdigit(token[a])) {
-				return Error;
-			}
+State fsmStates[9][5] = {
+		//  0					1					2				3					4
+		//	A-Za-z				0-9					.				$					:/Whitespace/End	State
+		{ IdentifierStart,		Number,				ErrorState,		ErrorState,			ErrorState },		// Initial
 
-			if (isdigit(token[a])) {
-				j = 1;				//0-9 
-									//i stays 6 if there was no decimal yet, or stays 7 if there was a decimal
-			}
-			else if (token[a] == '.') {
-				j = 2;				//.
-				i = 7;				//RealConsume
-			}
+		{ IdentifierConsume,	ErrorState,			ErrorState,		ErrorState,			ErrorState },		// IdentifierStart
+		{ IdentifierConsume,	IdentifierConsume,	ErrorState,		IdentifierEnd,		IdentifierEnd },	// IdentifierConsume
+		{ EndState,				EndState,			EndState,		EndState,			EndState },			// IdentifierEnd
+
+		{ ErrorState,			NumberConsume,		ErrorState,		ErrorState,			IntegerEnd },		// Number
+		{ ErrorState,			NumberConsume,		RealConsume,	ErrorState,			IntegerEnd },		// NumberConsume
+		{ ErrorState,			RealConsume,		ErrorState,		ErrorState,			RealEnd },			// RealConsume
+		{ EndState,				EndState,			EndState,		EndState,			EndState },			// Integer
+		{ EndState,				EndState,			EndState,		EndState,			EndState }			// Real
+};
+
+State getNextStateFromInput(State curState, char input) {
+	if (isalpha(input)) return fsmStates[curState][0];
+	if (isdigit(input)) return fsmStates[curState][1];
+	if (input == '.') return fsmStates[curState][2];
+	if (input == '$') return fsmStates[curState][3];
+	if (isWhitespace(input) || input == '\x0' || input == ':') return fsmStates[curState][4];
+	return ErrorState;
+}
+
+Token tokenFromFSM(string token) {
+	State curState = Initial;
+	Token tokenOut;
+
+	int curCharIdx = 0;
+	while ((curState != EndState && curState != ErrorState)) {
+		char curChar;
+		if (curCharIdx < token.length()) {
+			curChar = token[curCharIdx];
+		}
+		else {
+			curChar = '\x0';
+		}
+
+		curState = getNextStateFromInput(curState, curChar);
+
+		switch (curState) {
+		case IdentifierEnd:
+			tokenOut.val += curChar;
+			tokenOut.type = Identifier;
+			curState = EndState;
+			break;
+		case IntegerEnd:
+			tokenOut.type = Integer;
+			tokenOut.val += curChar;
+			tokenOut.intVal = atoi(tokenOut.val.data());
+			curState = EndState;
+			break;
+		case RealEnd:
+			tokenOut.type = Real;
+			tokenOut.val += curChar;
+			tokenOut.floatVal = atof(tokenOut.val.data());
+			curState = EndState;
+			break;
+		default:
+			tokenOut.val += curChar;
+			curCharIdx++;
+			break;
 		}
 	}
-	else
-		return Error;
-	
-	return End;
+
+	if (curState == ErrorState) {
+		cout << "Error parsing token: " << tokenOut.val << endl;
+		tokenOut.type = Error;
+	}
+
+	return tokenOut;
 }
+
+#endif
