@@ -92,7 +92,7 @@ Token tokenFromFSM(string token) {
 			tokenOut.type = Identifier;
 			
 			if (isdigit(tokenOut.val[tokenOut.val.size() - 1])) {
-				cout << "Identifier must end with letter or number: " << tokenOut.val << endl;
+				cout << "Identifier must end with letter or dollar sign: " << tokenOut.val << endl;
 				tokenOut.type = Error;
 				exit(-1);
 			}
