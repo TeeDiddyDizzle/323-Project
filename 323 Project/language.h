@@ -49,7 +49,7 @@ enum State {
 State fsmStates[9][5] = {
 		//  0					1					2				3					4
 		//	A-Za-z				0-9					.				$					:/Whitespace/End	State
-		{ IdentifierStart,		Number,				ErrorState,		ErrorState,			ErrorState },		// Initial
+		{ IdentifierConsume,	NumberConsume,		ErrorState,		ErrorState,			ErrorState },		// Initial
 
 		{ IdentifierConsume,	ErrorState,			ErrorState,		ErrorState,			ErrorState },		// IdentifierStart
 		{ IdentifierConsume,	IdentifierConsume,	ErrorState,		IdentifierEnd,		IdentifierEnd },	// IdentifierConsume
@@ -58,8 +58,8 @@ State fsmStates[9][5] = {
 		{ ErrorState,			NumberConsume,		ErrorState,		ErrorState,			IntegerEnd },		// Number
 		{ ErrorState,			NumberConsume,		RealConsume,	ErrorState,			IntegerEnd },		// NumberConsume
 		{ ErrorState,			RealConsume,		ErrorState,		ErrorState,			RealEnd },			// RealConsume
-		{ EndState,				EndState,			EndState,		EndState,			EndState },			// Integer
-		{ EndState,				EndState,			EndState,		EndState,			EndState }			// Real
+		{ EndState,				EndState,			EndState,		EndState,			EndState },			// IntegerEnd
+		{ EndState,				EndState,			EndState,		EndState,			EndState }			// RealEnd
 };
 
 State getNextStateFromInput(State curState, char input) {
@@ -91,7 +91,16 @@ Token tokenFromFSM(string token) {
 		case IdentifierEnd:
 			tokenOut.val += curChar;
 			tokenOut.type = Identifier;
-			curState = EndState;
+			
+			if (isdigit(tokenOut.val[tokenOut.val.length() - 2])) {
+				cout << "Identifier must end with letter or number: " << tokenOut.val << endl;
+				tokenOut.type = Error;
+				exit(-1);
+			}
+			else {
+				tokenOut.floatVal = atof(tokenOut.val.data());
+				curState = EndState;
+			}
 			break;
 		case IntegerEnd:
 			tokenOut.type = Integer;
@@ -102,8 +111,16 @@ Token tokenFromFSM(string token) {
 		case RealEnd:
 			tokenOut.type = Real;
 			tokenOut.val += curChar;
-			tokenOut.floatVal = atof(tokenOut.val.data());
-			curState = EndState;
+
+			if (tokenOut.val[tokenOut.val.length() - 2] == '.') {
+				cout << "Error parsing token: " << tokenOut.val << endl;
+				tokenOut.type = Error;
+				exit(-1);
+			}
+			else {
+				tokenOut.floatVal = atof(tokenOut.val.data());
+				curState = EndState;
+			}
 			break;
 		default:
 			tokenOut.val += curChar;
@@ -115,6 +132,7 @@ Token tokenFromFSM(string token) {
 	if (curState == ErrorState) {
 		cout << "Error parsing token: " << tokenOut.val << endl;
 		tokenOut.type = Error;
+		exit(-1);
 	}
 
 	return tokenOut;
