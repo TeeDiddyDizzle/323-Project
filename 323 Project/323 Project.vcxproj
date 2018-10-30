@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="analyzer.h" />
     <ClInclude Include="language.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="token.h" />
