@@ -127,7 +127,7 @@ int main(int argc, char* argv[])
 		infile.open(argv[1]);
 	}
 	else {
-		infile.open("input2.txt");
+		infile.open("test.txt");
 	}
 
 	if (infile.is_open()) {
