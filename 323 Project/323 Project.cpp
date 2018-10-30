@@ -121,6 +121,7 @@ std::vector<Token> tokenize(fstream& file) {
 
 int main(int argc, char* argv[])
 {
+	analyzer analyze;
 	fstream infile;
 	if (argc > 1) {
 		infile.open(argv[1]);
@@ -141,6 +142,6 @@ int main(int argc, char* argv[])
 	else {
 		cout << "Error opening file." << endl;
 	}
-
+	analyze.Rat18S();
 	system("pause");
 }
