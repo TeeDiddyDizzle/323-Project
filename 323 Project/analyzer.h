@@ -32,8 +32,8 @@ void nextToken() {
 class analyzer
 {
 public:
-	//Parser() {}
-	//~Parser() {}
+	//analyzer() {}
+	//~analyzer() {}
 	void Rat18S() {
 		nextToken();
 		if (syntaxSwitch) {
