@@ -9,9 +9,10 @@ bool isOperator(string);
 bool isSeparator(string);
 Token tokenFromFSM(string);
 
-std::vector<string> keywords = { "int", "boolean", "real", "function", "if", "endif", "else", "return", "put", "get", "while" };
+std::vector<string> keywords = { "int", "boolean", "real", "function", "if", "endif", "else", "return", "put", "get", "while", "true", "false" };
 std::vector<string> separators = { "(", ")", "{", "}", "[", "]", ":", ";", "%%", ",", "!"};
 std::vector<string> operators = { "=<", "=>", "<", ">", "^=", "==", "=", "*", "/", "+", "-" };
+
 
 bool isWhitespace(char curChar) {
 	return curChar == ' ' || curChar == '\t' || curChar == '\r' || curChar == '\n';
