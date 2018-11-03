@@ -1,11 +1,26 @@
+function findMin [numA: int, numB: int] {
+	if ( numA < numB) return numA;
+	else return numB; endif
+}
 
-function doSomeMath$ [] {
-	return 5 + 10 - 20 * 30 + 33.3 - 20.0;
+function findMax [numC: int, numD: int] {
+	if ( numA > numB) return numA;
+	else return numB; endif
 }
 
 %%
+! Declarations !
+int numA;
+int numB;
+boolean isLess;
+int temp$ = numA + numB;
+	put ( diff$ );
+	put ( numA + numB );
+if ( numA > numB ) isLess = 0;
+else isLess = 1; endif
 
-int num1$, num2$;
-while (num < 20) {
-	num = num + doSomeMath()
+while ( numA < temp$  ) {
+	put ( numA + 1.0 );
+	temp$ = temp$ - 1;
 }
+return temp$

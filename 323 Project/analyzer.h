@@ -26,6 +26,11 @@ void consumeToken() {
 	}
 }
 
+/* Returns the next token without changing currentToken */
+Token peekToken() {
+	return tokenList[counter];
+}
+
 class Analyzer
 {
 public:
@@ -84,7 +89,7 @@ public:
 
 			OptParameterList();
 
-			consumeToken();
+			// consumeToken(); OptParameterList consumes past the ], so we don't have to.
 			if (currentToken.val != "]") {
 				cout << "Expected ] in function definition got " << currentToken.val << endl;
 				exit(-1);
@@ -108,13 +113,86 @@ public:
 	}
 
 	void OptParameterList() {
-			
+		Token nextToken = peekToken();
+		if (nextToken.val == "]") {
+			/* No parameters; do nothing. */
+			if (syntaxSwitch) cout << "<Opt Parameter List> ::=  <Empty>" << endl;
+		}
+		else if (nextToken.type == Identifier) {
+			if (syntaxSwitch) cout << "<Opt Parameter List> ::=  <Parameter List>" << endl;
+
+			/* We have some identifiers */
+			ParameterList();
+		}
+		else {
+			/* Something else we didn't expect... */
+			cout << "Expected parameters or ] but got " << peekToken().val << endl;
+			exit(-1);
+		}
 	}
 
-	void ParameterList() {}
-	void Parameter() {}
-	void Qualifier() {}
-	void Body() {}
+	void ParameterList() {
+		while (currentToken.val != "]") {
+			if (currentToken.val == "," && peekToken().type != Identifier) {
+				// This checks for this case:
+				// [ numA : int, ]
+				cout << "Badly formed parameter list." << endl;
+				exit(-1);
+			}
+
+			Parameter();
+			consumeToken();
+		}
+
+		if (syntaxSwitch) cout << "<Parameter>    |     <Parameter> , <Parameter List>" << endl;
+	}
+
+	void Parameter() {
+		IDs();
+
+		consumeToken();
+		if (currentToken.val != ":") {
+			cout << "Expected : but got " << peekToken().val << endl;
+			exit(-1);
+		}
+
+		Qualifier();
+
+		if (syntaxSwitch) cout << "<IDs> : <Qualifier>" << endl;
+	}
+
+	void Qualifier() {
+		consumeToken();
+		if (currentToken.type != Keyword) {
+			cout << "Expected int | boolean | real but got " << peekToken().val << endl;
+			exit(-1);
+		}
+
+		if (syntaxSwitch) cout << "<Qualifier> ::= int     |    boolean    |  real " << endl;
+	}
+	
+	void Body() {
+		consumeToken();
+		if (currentToken.val != "{") {
+			cout << "Expected { in function body" << endl;
+			exit(-1);
+		}
+
+		// StatementList();
+		while (currentToken.val != "}") {
+			// TODO: If we hit the end of the file without finding }, that's an error.
+			Statement();
+		}
+
+		if (currentToken.val != "}") {
+			cout << "Expected } in function body" << endl;
+			exit(-1);
+		}
+
+		if (syntaxSwitch) cout << "R9. <Body>  ::=  {  < Statement List>  }" << endl;
+	}
+
+
 	void OptDeclarationList() {
 		if (syntaxSwitch) {
 			cout << "<Opt Declaration List> ::= <Declaration List> | <Empty>" << endl;
@@ -126,7 +204,17 @@ public:
 	}
 	void DeclerationList() {}
 	void Declaration() {}
-	void IDs() {}
+
+	void IDs() {
+		consumeToken();
+		if (currentToken.type != Identifier) {
+			cout << "Expected identifier but got " << peekToken().val << endl;
+			exit(-1);
+		}
+
+		if (syntaxSwitch) cout << "<IDs> ::=     <Identifier>    | <Identifier>, <IDs>" << endl;
+	}
+
 	void StatementList() {}
 	void Statement() {}
 	void Compound() {}
