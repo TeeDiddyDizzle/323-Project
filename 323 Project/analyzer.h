@@ -68,6 +68,7 @@ public:
 		}
 		else {
 			if (syntaxSwitch) cout << "<Opt Function Definitions> ::= <Empty>" << endl;
+			Empty();
 		}
 	}
 
@@ -117,6 +118,7 @@ public:
 		if (nextToken.val == "]") {
 			/* No parameters; do nothing. */
 			if (syntaxSwitch) cout << "<Opt Parameter List> ::=  <Empty>" << endl;
+			Empty();
 		}
 		else if (nextToken.type == Identifier) {
 			if (syntaxSwitch) cout << "<Opt Parameter List> ::=  <Parameter List>" << endl;
@@ -182,6 +184,7 @@ public:
 		while (currentToken.val != "}") {
 			// TODO: If we hit the end of the file without finding }, that's an error.
 			Statement();
+			consumeToken();
 		}
 
 		if (currentToken.val != "}") {
@@ -200,8 +203,8 @@ public:
 		else {
 			exit(-1);
 		}
-	
 	}
+
 	void DeclerationList() {}
 	void Declaration() {}
 
@@ -216,11 +219,68 @@ public:
 	}
 
 	void StatementList() {}
-	void Statement() {}
+	void Statement() {
+		consumeToken();
+		if (currentToken.type == Keyword) {
+			if (currentToken.val == "return") {
+				Return();
+			}
+			else if (currentToken.val == "if") {
+				If();
+			}
+			else if (currentToken.val == "put") {
+				Print();
+			}
+			else if (currentToken.val == "get") {
+				Scan();
+			}
+			else if (currentToken.val == "while") {
+				While();
+			}
+			else {
+				cout << "Expected a token of return|if|put|get|while got " << currentToken.val << endl;
+				exit(-1);
+			}
+		}
+		else if (currentToken.type == Separator) {
+			Compound();
+		} else if (currentToken.type == Identifier) {
+			Assign();
+		} else {
+			cout << "Expected a statement got " << currentToken.val << endl;
+		}
+	}
+
 	void Compound() {}
 	void Assign() {}
+
 	void If() {}
-	void Return() {}
+	void Return() {
+		if (currentToken.val != "return") {
+			cout << "This shouldn't happen." << endl;
+			exit(-1);
+		}
+
+		consumeToken();
+		if (currentToken.type == Identifier) {
+			if (syntaxSwitch) cout << "<Return> ::=  return <Expression> ;" << endl;
+
+			Expression();
+
+			consumeToken();
+			if (currentToken.type != Separator && currentToken.val != ";") {
+				cout << "Expected a ; got a " << currentToken.val << endl;
+				exit(-1);
+			}
+		}
+		else if (currentToken.type == Separator && currentToken.val == ";") {
+			if (syntaxSwitch) cout << "<Return> ::=  return ;" << endl;
+		}
+		else {
+			cout << "Expected an identifier or ; got " << currentToken.val << endl;
+			exit(-1);
+		}
+	}
 	void Print() {}
 	void Scan() {}
 	void While() {}
@@ -244,18 +304,10 @@ public:
 			exit(-1);
 		}
 	}
+
 	void Empty() {
-		if (syntaxSwitch)
-			cout << "<Empty>   ::= "  << endl;
-
+		if (syntaxSwitch) cout << "<Empty>   ::= "  << endl;
 	}
-
 };
-
-
-
-
-
-
 
 #endif

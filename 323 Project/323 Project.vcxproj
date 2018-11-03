@@ -154,7 +154,6 @@
     <ClInclude Include="analyzer.h" />
     <ClInclude Include="language.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="syntax.h" />
     <ClInclude Include="token.h" />
   </ItemGroup>
   <ItemGroup>
