@@ -26,6 +26,12 @@ void consumeToken() {
 	}
 }
 
+void deconsumeToken() {
+	if (counter < tokenList.size()) {
+		currentToken = tokenList[counter--];
+	}
+}
+
 /* Returns the next token without changing currentToken */
 Token peekToken() {
 	return tokenList[counter];
@@ -254,7 +260,45 @@ public:
 	void Compound() {}
 	void Assign() {}
 
-	void If() {}
+	void If() {
+		consumeToken();
+		if (currentToken.val != "(") {
+			cout << "If expected a ( but got " << currentToken.val << endl;
+			exit(-1);
+		}
+
+		Condition();
+
+		consumeToken();
+		if (currentToken.val != ")") {
+			cout << "If expected a ) but got " << currentToken.val << endl;
+			exit(-1);
+		}
+
+		Statement();
+
+		consumeToken();
+		if (currentToken.val == "else") {
+			Statement();
+
+			consumeToken();
+			if (currentToken.val == "endif") {
+				if (syntaxSwitch) cout << "if  ( <Condition>  ) <Statement>   else  <Statement>  endif" << endl;
+			}
+			else {
+				cout << "If expected else or endif but got " << currentToken.val << endl;
+				exit(-1);
+			}
+		}
+		else if (currentToken.val == "endif") {
+			if (syntaxSwitch) cout << "if  ( <Condition>  ) <Statement>   endif" << endl;
+		}
+		else {
+			cout << "If expected else or endif but got " << currentToken.val << endl;
+			exit(-1);
+		}
+	}
+
 	void Return() {
 		if (currentToken.val != "return") {
 			cout << "This shouldn't happen." << endl;
@@ -277,18 +321,69 @@ public:
 			if (syntaxSwitch) cout << "<Return> ::=  return ;" << endl;
 		}
 		else {
-			cout << "Expected an identifier or ; got " << currentToken.val << endl;
+			cout << "Expected an expression or ; got " << currentToken.val << endl;
 			exit(-1);
 		}
 	}
+
 	void Print() {}
 	void Scan() {}
 	void While() {}
-	void Condition() {}
-	void Relop() {}
-	void Expression() {}
-	void Term() {}
-	void Factor() {}
+
+	void Condition() {
+		Expression();
+		Relop();
+		Expression();
+
+		if (syntaxSwitch) cout << "<Condition> ::= <Expression> <Relop> <Expression>" << endl;
+	}
+
+	void Relop() {
+		consumeToken();
+		if (currentToken.val == "==" || currentToken.val == "^=" || currentToken.val == ">" ||
+			currentToken.val == "<" || currentToken.val == "=>" || currentToken.val == "=<") {
+			if (syntaxSwitch) cout << "<Relop> ::= == | ^= | > | < | => | =<" << endl;
+		}
+		else {
+			cout << "Expected a relop" << endl;
+			exit(-1);
+		}
+	}
+
+	void Expression() {
+		consumeToken();
+
+		int tokensConsumed = 0;
+		while (currentToken.val == "+" || currentToken.val == "-" || currentToken.val == "*" || 
+			currentToken.val == "/" || currentToken.type == Integer || currentToken.type == Real || 
+			currentToken.type == Identifier) {
+
+			// Consume everything that should be in an expression.
+			// This is pretty lame.
+
+			consumeToken();
+			tokensConsumed++;
+		}
+
+		if (tokensConsumed == 0) {
+			cout << "Expected an expression got " << currentToken.val << endl;
+			exit(-1);
+		}
+
+		if (syntaxSwitch) cout << "<Expression>  ::=    <Expression> + <Term>    | <Expression>  - <Term>    |    <Term>" << endl;
+
+		deconsumeToken();
+	}
+
+	void Term() {
+		
+	}
+
+	void Factor() {
+		
+	}
+
+
 	void Primary() {
 		consumeToken();
 
