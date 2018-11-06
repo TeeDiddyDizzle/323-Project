@@ -69,7 +69,7 @@ public:
 
 			FunctionDefinition(false);
 			while (currentToken.val == "function") {
-				FunctionDefinition();
+				FunctionDefinition(false);
 			}
 		}
 		else {
@@ -86,7 +86,11 @@ public:
 			if (syntaxSwitch) cout << "<Function> ::= function  <Identifier>  [ <Opt Parameter List> ]  <Opt Declaration List>  <Body>" << endl;
 
 			// Get the function name <Identifier>
-			Primary();
+			consumeToken();
+			if (currentToken.type != Identifier) {
+				cout << "Expected identifier in function definition got " << currentToken.val << endl;
+				exit(-1);
+			}
 
 			consumeToken();
 			if (currentToken.val != "[") {
@@ -140,6 +144,8 @@ public:
 	}
 
 	void ParameterList() {
+		if (syntaxSwitch) cout << "<Parameter> | <Parameter> , <Parameter List>" << endl;
+
 		while (currentToken.val != "]") {
 			if (currentToken.val == "," && peekToken().type != Identifier) {
 				// This checks for this case:
@@ -151,11 +157,11 @@ public:
 			Parameter();
 			consumeToken();
 		}
-
-		if (syntaxSwitch) cout << "<Parameter>    |     <Parameter> , <Parameter List>" << endl;
 	}
 
 	void Parameter() {
+		if (syntaxSwitch) cout << "<IDs> : <Qualifier>" << endl;
+
 		IDs();
 
 		consumeToken();
@@ -165,21 +171,21 @@ public:
 		}
 
 		Qualifier();
-
-		if (syntaxSwitch) cout << "<IDs> : <Qualifier>" << endl;
 	}
 
 	void Qualifier() {
+		if (syntaxSwitch) cout << "<Qualifier> ::= int | boolean | real" << endl;
+
 		consumeToken();
 		if (currentToken.type != Keyword) {
 			cout << "Expected int | boolean | real but got " << peekToken().val << endl;
 			exit(-1);
 		}
-
-		if (syntaxSwitch) cout << "<Qualifier> ::= int     |    boolean    |  real " << endl;
 	}
 	
 	void Body() {
+		if (syntaxSwitch) cout << "<Body>  ::=  {  <Statement List>  }" << endl;
+
 		consumeToken();
 		if (currentToken.val != "{") {
 			cout << "Expected { in function body" << endl;
@@ -197,8 +203,7 @@ public:
 			cout << "Expected } in function body" << endl;
 			exit(-1);
 		}
-
-		if (syntaxSwitch) cout << "R9. <Body>  ::=  {  < Statement List>  }" << endl;
+		consumeToken();
 	}
 
 
@@ -309,6 +314,7 @@ public:
 		if (currentToken.type == Identifier) {
 			if (syntaxSwitch) cout << "<Return> ::=  return <Expression> ;" << endl;
 
+			deconsumeToken();
 			Expression();
 
 			consumeToken();
@@ -350,18 +356,25 @@ public:
 		}
 	}
 
+	bool isRelop(string strIn) {
+		return (strIn == "==" || strIn == "^=" || strIn == ">" || strIn == "<" || strIn == "=>" || strIn == "=<");
+	}
+
 	void Expression() {
 		consumeToken();
 
+		/* What tokens can we use to determine when an expression is done being parsed 
+		 *  1) ')'
+		 *  2) ';'
+		 *  3) <Relop>
+		 * Once we're in an expression, we only accept <Primary>'s
+		 */
+
+
 		int tokensConsumed = 0;
-		while (currentToken.val == "+" || currentToken.val == "-" || currentToken.val == "*" || 
-			currentToken.val == "/" || currentToken.type == Integer || currentToken.type == Real || 
-			currentToken.type == Identifier) {
-
-			// Consume everything that should be in an expression.
-			// This is pretty lame.
-
+		while (currentToken.val != ")" && currentToken.val != ";" && !isRelop(currentToken.val)) {
 			consumeToken();
+
 			tokensConsumed++;
 		}
 
@@ -370,7 +383,7 @@ public:
 			exit(-1);
 		}
 
-		if (syntaxSwitch) cout << "<Expression>  ::=    <Expression> + <Term>    | <Expression>  - <Term>    |    <Term>" << endl;
+		if (syntaxSwitch) cout << "<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>" << endl;
 
 		deconsumeToken();
 	}

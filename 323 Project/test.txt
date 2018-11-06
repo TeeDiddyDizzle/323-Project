@@ -4,8 +4,8 @@ function findMin [numA: int, numB: int] {
 }
 
 function findMax [numC: int, numD: int] {
-	if ( numA > numB) return numA;
-	else return numB; endif
+	if ( numA > numB) return numZ;
+	else return numX; endif
 }
 
 %%
