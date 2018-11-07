@@ -58,8 +58,8 @@ public:
 				cout << "\t<Rat18S>  ::=   <Opt Function Definitions>   %%  <Opt Declaration List>  <Statement List> " << endl;
 			}
 
-			consumeToken();
 			OptDeclarationList();
+			StatementList();
 		}
 		else
 		{
@@ -201,22 +201,13 @@ public:
 		}
 		StatementList();
 
-		while (currentToken.val != "}") {
-			// TODO: If we hit the end of the file without finding }, that's an error.
-			Statement();
-			consumeToken();
-		}
-
-		if (currentToken.val != "}") {
-			cout << "Expected } in function body" << endl;
-			exit(-1);
-		}
-		consumeToken();
+		
 	}
 
 
 	void OptDeclarationList() {
-		if (currentToken.val == "int" || currentToken.val == "real" || currentToken.val == "boolean") {
+		Token nextToken = peekToken();
+		if (nextToken.val == "int" || nextToken.val == "real" || nextToken.val == "boolean") {
 			if (syntaxSwitch) cout << "\t<Opt Declaration List> ::= <Declaration List> | <Empty>" << endl;
 			DeclerationList();
 		}
@@ -224,19 +215,43 @@ public:
 	}
 
 	void DeclerationList() {
-		if (syntaxSwitch) cout << "\t<Declaration List>  : = <Declaration>; | <Declaration>; <Declaration List>";
-	
+		if (syntaxSwitch) cout << "\t<Declaration List>  : = <Declaration>; | <Declaration>; <Declaration List>" << endl;
+		consumeToken();
 		Declaration();
 	}
 	void Declaration() {
-		if (syntaxSwitch) cout << "\t<Declaration> ::=   <Qualifier > <IDs>";
+		if (syntaxSwitch) {
+			cout << "\t<Declaration> ::=   <Qualifier > <IDs>" << endl;
+			cout << "\t<Qualifier> ::= int | boolean | real " << endl;
+		}
+
+		if (currentToken.val != "int" && currentToken.val != "real" && currentToken.val != "boolean") {
+			cout << "Expected an int | real | boolean, got " << currentToken.val;
+			exit(-1);
+		}
+		
+		IDs();
+		
+		consumeToken();
+		if (currentToken.val != ";") {
+			cout << "Expected a ; but got " << currentToken.val << endl;
+			exit(-1);
+		}
+
+		Token nextToken = peekToken();
+		if (nextToken.val == "int" || nextToken.val == "real" || nextToken.val == "boolean") {
+			consumeToken();
+			Declaration();
+		}
+
+
 
 	}
 
 	void IDs() {
+		consumeToken();
 		if (syntaxSwitch) cout << "\t<IDs> ::=     <Identifier>    | <Identifier>, <IDs>" << endl;
 
-		consumeToken();
 		if (currentToken.type != Identifier) {
 			cout << "Expected identifier but got " << peekToken().val << endl;
 			exit(-1);
@@ -249,6 +264,17 @@ public:
 			cout << "\t<Statement List> ::=   <Statement>   | <Statement> <Statement List>" << endl;
 			cout << "\t<Statement> :: = <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>" << endl;
 		}
+		while (currentToken.val != "}") {
+			// TODO: If we hit the end of the file without finding }, that's an error.
+			Statement();
+			consumeToken();
+		}
+
+		if (currentToken.val != "}") {
+			cout << "Expected } in function body" << endl;
+			exit(-1);
+		}
+		consumeToken();
 	}
 
 	void Statement() {
@@ -360,7 +386,6 @@ public:
 	void Print() {
 		if (syntaxSwitch) cout << "\t<Print> ::=    put ( <Expression>);" << endl;
 		
-		consumeToken();
 		if (currentToken.val != "put") {
 			cout << "Expected keyword put, got " << currentToken.val << endl;
 			exit(-1);
