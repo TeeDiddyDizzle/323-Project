@@ -310,7 +310,19 @@ public:
 	}
 
 	void Compound() {}
-	void Assign() {}
+	void Assign() {
+		if (currentToken.type != Identifier) {
+			cout << "Expected Identifier got " << currentToken.val;
+			exit(-1);
+		}
+		consumeToken();
+		if (currentToken.val != "=") {
+			cout << "Expected = got " << currentToken.val;
+			exit(-1);
+		}
+		Expression();
+
+	}
 
 	void If() {
 		cout << "\t<If> ::= if ( <Condition> ) <Statement> endif | \n\tif (<Condition>) < Statement > else <Statement> endif" << endl;
@@ -410,6 +422,8 @@ public:
 			cout << "Expected a ; got a " << currentToken.val << endl;
 			exit(-1);
 		}
+
+		deconsumeToken();
 	}
 	void Scan() {
 		if (syntaxSwitch) cout << "\t<Scan> ::=    get ( <IDs> );";
