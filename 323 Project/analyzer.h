@@ -309,7 +309,16 @@ public:
 		}
 	}
 
-	void Compound() {}
+	void Compound() {
+		if (syntaxSwitch) {
+			cout << "<Compound>  ::=	{ <Statement List>> } " << endl;
+		}
+		if (currentToken.val != "{") {
+			cout << "Expected '{' got " << currentToken.val;
+			exit(-1);
+		}
+		StatementList();
+	}
 	void Assign() {
 		if (currentToken.type != Identifier) {
 			cout << "Expected Identifier got " << currentToken.val;
