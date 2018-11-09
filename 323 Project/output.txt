@@ -1,43 +1,121 @@
           Token         Lexeme
-        Keyword       function
-     Identifier    doSomeMath$
-      Separator              [
-      Separator              ]
-      Separator              {
-        Keyword         return
-        Integer              5
-       Operator              +
-        Integer             10
-       Operator              -
-        Integer             20
-       Operator              *
-        Integer             30
-       Operator              +
-           Real           33.3
-       Operator              -
-           Real           20.0
-      Separator              ;
-      Separator              }
-      Separator             %%
-        Keyword            int
-     Identifier          num1$
-      Separator              ,
-     Identifier          num2$
-      Separator              ;
-        Keyword          while
-      Separator              (
-     Identifier            num
-       Operator              <
-        Integer             20
-      Separator              )
-      Separator              {
-     Identifier            num
-       Operator              =
-     Identifier            num
-       Operator              +
-     Identifier     doSomeMath
-      Separator              (
-      Separator              )
-      Separator              }
-      Separator              }
-Press any key to continue . . . 
+
+Keyword             function
+        <Opt Function Definitions> ::= <Function Definitions>
+        <Function Definitions>  ::= <Function> | <Function> <Function Definitions>
+        <Function> ::= function  <Identifier>  [ <Opt Parameter List> ]  <Opt Declaration List>  <Body>
+
+Identifier          doSomeMath$
+
+Separator           [
+        <Opt Parameter List> ::=  <Empty>
+        <Empty>   ::=
+
+Separator           ]
+
+Separator           {
+        <Body>  ::=  {  <Statement List>  }
+        <Statement List> ::=   <Statement>   | <Statement> <Statement List>
+        <Statement> :: = <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>
+
+Keyword             return
+        <Return> ::=  return ; |  return <Expression> ;
+
+Integer             5
+        <Return> ::=  return <Expression> ;
+
+Integer             5
+        <Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            +
+
+Integer             10
+
+Operator            -
+
+Integer             20
+
+Operator            *
+
+Integer             30
+
+Operator            +
+
+Real                33.3
+
+Operator            -
+
+Real                20.0
+
+Separator           ;
+
+Separator           ;
+
+Separator           }
+
+Separator           %%
+        <Rat18S>  ::=   <Opt Function Definitions>   %%  <Opt Declaration List>  <Statement List>
+        <Opt Declaration List> ::= <Declaration List> | <Empty>
+        <Declaration List>  : = <Declaration>; | <Declaration>; <Declaration List>
+
+Keyword             int
+        <Declaration> ::=   <Qualifier > <IDs>
+        <Qualifier> ::= int | boolean | real
+
+Identifier          num1$
+        <IDs> ::=     <Identifier>    | <Identifier>, <IDs>
+
+Separator           ,
+
+Identifier          num2$
+
+Separator           ;
+        <Statement List> ::=   <Statement>   | <Statement> <Statement List>
+        <Statement> :: = <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>
+
+Keyword             while
+        <While> ::=  while ( <Condition> )  <Statement>
+
+Separator           (
+
+Identifier          num
+        <Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            <
+
+Operator            <
+        <Relop> ::= == | ^= | > | < | => | =<
+
+Integer             20
+        <Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           )
+        <Condition> ::= <Expression> <Relop> <Expression>
+
+Separator           )
+
+Separator           {
+<Compound>  ::= { <Statement List>> }
+        <Statement List> ::=   <Statement>   | <Statement> <Statement List>
+        <Statement> :: = <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>
+
+Identifier          num
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Identifier          num
+        <Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            +
+
+Identifier          doSomeMath
+
+Separator           (
+
+Separator           )
+
+Separator           ;
+
+Separator           }
+EOF

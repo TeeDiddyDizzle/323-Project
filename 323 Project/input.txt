@@ -5,5 +5,5 @@ function doSomeMath$ [] {
 %%
 int num1$, num2$;
 while (num < 20) {
-	num = num + doSomeMath()
+	num = num + doSomeMath();
 }

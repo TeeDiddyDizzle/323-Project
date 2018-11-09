@@ -25,23 +25,35 @@ void consumeToken() {
 			cout << "\n" << setw(20) << left << getTokenType(currentToken.type) << currentToken.val << endl;
 		}
 	}
+	else {
+		cout << "EOF" << endl;
+		exit(0);
+	}
 }
 
-//Consumes next token without printing it 
-void reconsumeToken() {
-	if (counter < tokenList.size()) {
-		currentToken = tokenList[counter++];
-	}
-}
 void deconsumeToken() {
-	if (counter < tokenList.size()) {
-		currentToken = tokenList[counter--];
-	}
+	currentToken = tokenList[--counter];
 }
 
 /* Returns the next token without changing currentToken */
 Token peekToken() {
-	return tokenList[counter];
+	if (counter < tokenList.size()) {
+		return tokenList[counter];
+	}
+	else {
+		cout << "EOF" << endl;
+		exit(0);
+	}
+}
+
+Token peekPrevToken() {
+	if (counter > 1) {
+		return tokenList[counter - 2];
+	}
+	else {
+		cout << "This shouldn't happen" << endl;
+		exit(0);
+	}
 }
 
 class Analyzer
@@ -67,7 +79,7 @@ public:
 			exit(-1);
 		}
 	}
-	
+
 	void OptFunctionDefinitions() {
 		consumeToken();
 
@@ -137,6 +149,7 @@ public:
 			/* No parameters; do nothing. */
 			if (syntaxSwitch) cout << "\t<Opt Parameter List> ::=  <Empty>" << endl;
 			Empty();
+			consumeToken();
 		}
 		else if (nextToken.type == Identifier) {
 			if (syntaxSwitch) cout << "\t<Opt Parameter List> ::=  <Parameter List>" << endl;
@@ -174,7 +187,7 @@ public:
 
 		consumeToken();
 		if (currentToken.val != ":") {
-			cout << "Expected : but got " << peekToken().val << endl;
+			cout << "Expected : but got " << currentToken.val << endl;
 			exit(-1);
 		}
 
@@ -190,7 +203,7 @@ public:
 			exit(-1);
 		}
 	}
-	
+
 	void Body() {
 		consumeToken();
 		if (syntaxSwitch) cout << "\t<Body>  ::=  {  <Statement List>  }" << endl;
@@ -201,7 +214,13 @@ public:
 		}
 		StatementList();
 
-		
+		consumeToken();
+		if (currentToken.val != "}") {
+			cout << "Expected } in function body" << endl;
+			exit(-1);
+		}
+
+		consumeToken();
 	}
 
 
@@ -211,7 +230,7 @@ public:
 			if (syntaxSwitch) cout << "\t<Opt Declaration List> ::= <Declaration List> | <Empty>" << endl;
 			DeclerationList();
 		}
-		
+
 	}
 
 	void DeclerationList() {
@@ -219,6 +238,7 @@ public:
 		consumeToken();
 		Declaration();
 	}
+
 	void Declaration() {
 		if (syntaxSwitch) {
 			cout << "\t<Declaration> ::=   <Qualifier > <IDs>" << endl;
@@ -229,9 +249,9 @@ public:
 			cout << "Expected an int | real | boolean, got " << currentToken.val;
 			exit(-1);
 		}
-		
+
 		IDs();
-		
+
 		consumeToken();
 		if (currentToken.val != ";") {
 			cout << "Expected a ; but got " << currentToken.val << endl;
@@ -243,20 +263,18 @@ public:
 			consumeToken();
 			Declaration();
 		}
-
-
-
 	}
 
 	void IDs() {
 		consumeToken();
 		if (syntaxSwitch) cout << "\t<IDs> ::=     <Identifier>    | <Identifier>, <IDs>" << endl;
 
-		if (currentToken.type != Identifier) {
-			cout << "Expected identifier but got " << peekToken().val << endl;
-			exit(-1);
+		while (peekToken().val != ";" && peekToken().val != ")" && peekToken().val != ":") {
+			if (currentToken.type != Identifier && currentToken.val != ",") {
+				break;
+			}
+			consumeToken();
 		}
-
 	}
 
 	void StatementList() {
@@ -264,17 +282,12 @@ public:
 			cout << "\t<Statement List> ::=   <Statement>   | <Statement> <Statement List>" << endl;
 			cout << "\t<Statement> :: = <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>" << endl;
 		}
-		while (currentToken.val != "}") {
+
+		while (peekToken().val != "}") {
 			// TODO: If we hit the end of the file without finding }, that's an error.
 			Statement();
-			consumeToken();
+			//consumeToken();
 		}
-
-		if (currentToken.val != "}") {
-			cout << "Expected } in function body" << endl;
-			exit(-1);
-		}
-		consumeToken();
 	}
 
 	void Statement() {
@@ -300,12 +313,43 @@ public:
 				exit(-1);
 			}
 		}
-		else if (currentToken.type == Separator) {
+		else if (currentToken.val == "{") {
 			Compound();
-		} else if (currentToken.type == Identifier) {
+		}
+		else if (currentToken.type == Identifier && peekToken().val == "=") {
 			Assign();
+		}
+		else if (peekPrevToken().type == Identifier && currentToken.val == "(") {
+			// Function call with parameters
+			if (currentToken.val == "(") {
+				consumeToken();
+				IDs();
+				consumeToken();
+				if (currentToken.val == ")") {
+					consumeToken();
+					if (currentToken.val == ";") {
+						consumeToken();
+					}
+					else
+					{
+						cout << "Expected ';', got " << currentToken.val << endl;
+						exit(-1);
+					}
+				}
+				else {
+					cout << "Expected ')', got " << currentToken.val << endl;
+					exit(-1);
+				}
+
+			}
+			else {
+				cout << "Expected '(' " << currentToken.val << endl;
+				exit(-1);
+			}
+
 		} else {
 			cout << "Expected a statement got " << currentToken.val << endl;
+			exit(-1);
 		}
 	}
 
@@ -313,28 +357,47 @@ public:
 		if (syntaxSwitch) {
 			cout << "<Compound>  ::=	{ <Statement List>> } " << endl;
 		}
+
 		if (currentToken.val != "{") {
 			cout << "Expected '{' got " << currentToken.val;
 			exit(-1);
 		}
 		StatementList();
+
+		consumeToken();
+		if (currentToken.val != "}") {
+			cout << "Expected } in function body" << endl;
+			exit(-1);
+		}
+
+		//consumeToken();
 	}
+
 	void Assign() {
+		if (syntaxSwitch) cout << "<Assign> ::= <Identifier> = <Expression> ;" << endl;
+
 		if (currentToken.type != Identifier) {
 			cout << "Expected Identifier got " << currentToken.val;
 			exit(-1);
 		}
+
 		consumeToken();
 		if (currentToken.val != "=") {
 			cout << "Expected = got " << currentToken.val;
 			exit(-1);
 		}
+
 		Expression();
 
+		consumeToken();
+		if (currentToken.val != ";") {
+			cout << "Expected ; got " << currentToken.val;
+			exit(-1);
+		}
 	}
 
 	void If() {
-		cout << "\t<If> ::= if ( <Condition> ) <Statement> endif | \n\tif (<Condition>) < Statement > else <Statement> endif" << endl;
+		if (syntaxSwitch) cout << "\t<If> ::= if ( <Condition> ) <Statement> endif | \n\tif (<Condition>) < Statement > else <Statement> endif" << endl;
 
 		consumeToken();
 		if (currentToken.val != "(") {
@@ -375,7 +438,7 @@ public:
 	}
 
 	void Return() {
-		if(syntaxSwitch) cout << "\t<Return> ::=  return ; |  return <Expression> ;" << endl;
+		if (syntaxSwitch) cout << "\t<Return> ::=  return ; |  return <Expression> ;" << endl;
 
 		if (currentToken.val != "return") {
 			cout << "This shouldn't happen." << endl;
@@ -383,7 +446,7 @@ public:
 		}
 
 		consumeToken();
-		if (currentToken.type == Identifier) {
+		if (currentToken.type == Identifier || currentToken.type == Integer || currentToken.type == Real || currentToken.val == "(") {
 			if (syntaxSwitch) cout << "\t<Return> ::=  return <Expression> ;" << endl;
 
 			deconsumeToken();
@@ -406,7 +469,7 @@ public:
 
 	void Print() {
 		if (syntaxSwitch) cout << "\t<Print> ::=    put ( <Expression>);" << endl;
-		
+
 		if (currentToken.val != "put") {
 			cout << "Expected keyword put, got " << currentToken.val << endl;
 			exit(-1);
@@ -431,36 +494,36 @@ public:
 			cout << "Expected a ; got a " << currentToken.val << endl;
 			exit(-1);
 		}
-
-		deconsumeToken();
 	}
+
 	void Scan() {
 		if (syntaxSwitch) cout << "\t<Scan> ::=    get ( <IDs> );";
-		consumeToken();
-		
+
 		if (currentToken.val != "get") {
 			cout << "Expected keyword get, got " << currentToken.val << endl;
 			exit(-1);
 		}
-		
+
+		consumeToken();
 		if (currentToken.val == "(") {
+			consumeToken();
+			IDs();
+			consumeToken();
+			if (currentToken.val == ")") {
 				consumeToken();
-				IDs();
-				if (currentToken.val == ")") {
+				if (currentToken.val == ";") {
 					consumeToken();
-					if (currentToken.val == ";") {
-						consumeToken();
-					}
-					else
-					{
-						cout << "Expected ';', got " << currentToken.val << endl;
-						exit(-1);
-					}
 				}
-				else {
-					cout << "Expected ')', got " << currentToken.val << endl;
+				else
+				{
+					cout << "Expected ';', got " << currentToken.val << endl;
 					exit(-1);
 				}
+			}
+			else {
+				cout << "Expected ')', got " << currentToken.val << endl;
+				exit(-1);
+			}
 
 		}
 		else {
@@ -468,10 +531,11 @@ public:
 			exit(-1);
 		}
 
-		
+
 	}
+
 	void While() {
-		if (syntaxSwitch) cout << "\t<While> ::=  while ( <Condition>  )  <Statement>" << endl;
+		if (syntaxSwitch) cout << "\t<While> ::=  while ( <Condition> )  <Statement>" << endl;
 
 		consumeToken();
 		if (currentToken.val != "(") {
@@ -480,6 +544,13 @@ public:
 		}
 
 		Condition();
+
+		consumeToken();
+		if (currentToken.val != ")") {
+			cout << "Expected a ) got " << currentToken.val << endl;
+			exit(-1);
+		}
+
 		Statement();
 	}
 
@@ -510,18 +581,18 @@ public:
 	void Expression() {
 		consumeToken();
 
-		/* What tokens can we use to determine when an expression is done being parsed 
+		/* What tokens can we use to determine when an expression is done being parsed
 		 *  1) ')'
 		 *  2) ';'
 		 *  3) <Relop>
 		 * Once we're in an expression, we only accept <Primary>'s
 		 */
 
+		if (syntaxSwitch) cout << "\t<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>" << endl;
 
-		int tokensConsumed = 0;
+		int tokensConsumed = 1;
 		while (currentToken.val != ")" && currentToken.val != ";" && !isRelop(currentToken.val)) {
 			consumeToken();
-
 			tokensConsumed++;
 		}
 
@@ -530,17 +601,20 @@ public:
 			exit(-1);
 		}
 
-		if (syntaxSwitch) cout << "\t<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>" << endl;
-
-		deconsumeToken();
+		if (peekPrevToken().val == "(" && currentToken.val == ")") {
+			// Functional call with no params
+		}
+		else {
+			deconsumeToken();
+		}
 	}
 
 	void Term() {
-		
+
 	}
 
 	void Factor() {
-		
+
 	}
 
 
@@ -561,7 +635,7 @@ public:
 	}
 
 	void Empty() {
-		if (syntaxSwitch) cout << "\t<Empty>   ::= "  << endl;
+		if (syntaxSwitch) cout << "\t<Empty>   ::= " << endl;
 	}
 };
 

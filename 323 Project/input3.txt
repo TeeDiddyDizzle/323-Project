@@ -1,19 +1,18 @@
-!the following is a rat18S sample  !
+function add [first: real, second:real] {
+    return first + second;
+}
 
-function add [first: real second:real] {
-    return (real + real);
-
-function subtract [first:real , second: real){
-    return (real - real);
+function subtract [first:real, second: real] {
+    return first - second;
 }
 
 %% 
 
-
-real first, second;
-! call functions!
-get(first,second);
 real total;
+real first, second;
 
-add(first,second);
-subtract(first-second);
+! call functions!
+get(first, second);
+
+add(first, second);
+subtract(first, second);

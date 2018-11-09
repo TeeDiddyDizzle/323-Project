@@ -8,7 +8,7 @@ function findMin [numA: int, numB: int] {
 int numA;
 int numB;
 boolean isLess;
-int temp$ = numA + numB;
+int temp$;
 	put ( diff$ );
 	put ( numA + numB );
 if ( numA > numB ) isLess = 0;
