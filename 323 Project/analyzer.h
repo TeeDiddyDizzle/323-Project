@@ -4,6 +4,9 @@
 #define ANALYZER_H
 
 #include <iostream>
+#include <fstream>
+#include <map>
+#include <list>
 
 using namespace std;
 
@@ -59,6 +62,17 @@ Token peekPrevToken() {
 class Analyzer
 {
 public:
+	ofstream instructions;
+	std::map<string, Symbol> symbolTable;
+
+	Analyzer() {
+		instructions.open("instructions.txt");
+		if (instructions.is_open() == false) {
+			cout << "Error opening instructions file for output." << endl;
+			exit(errno);
+		}
+	}
+
 	//analyzer() {}
 	void Rat18S() {
 		// Check for any function defs before the %% separator
@@ -239,6 +253,15 @@ public:
 		Declaration();
 	}
 
+	Symbol getSymbolByName(string name) {
+		if (symbolTable.count(name) == 0) {
+			cout << "Identifier " << name << " has not been defined." << endl;
+			exit(-1);
+		}
+
+		return symbolTable[name];
+	}
+
 	void Declaration() {
 		if (syntaxSwitch) {
 			cout << "\t<Declaration> ::=   <Qualifier > <IDs>" << endl;
@@ -250,7 +273,25 @@ public:
 			exit(-1);
 		}
 
-		IDs();
+		std::list<Token> listOfDeclarations = IDs();
+		int memoryLocation = 2000;
+
+		for (std::list<Token>::iterator it = listOfDeclarations.begin(); it != listOfDeclarations.end(); it++) {
+			Token potentialIdentifier = *it;
+
+			// Check symbol table map for similar entry
+			if (symbolTable.count(potentialIdentifier.val)) {
+				cout << "Identifier " << potentialIdentifier.val << " has already been defined." << endl;
+				exit(-1);
+			}
+
+			// Create new symbol table entry if none exists
+			Symbol newSymbol;
+			newSymbol.idName = potentialIdentifier.val;
+			newSymbol.memoryLocation = memoryLocation++;
+
+			symbolTable[newSymbol.idName] = newSymbol;
+		}
 
 		consumeToken();
 		if (currentToken.val != ";") {
@@ -265,16 +306,26 @@ public:
 		}
 	}
 
-	void IDs() {
+	std::list<Token> IDs(int limit = -1) {
+		std::list<Token> listOfIDs;
+		if (currentToken.type == Identifier) listOfIDs.push_back(currentToken);
+
 		consumeToken();
 		if (syntaxSwitch) cout << "\t<IDs> ::=     <Identifier>    | <Identifier>, <IDs>" << endl;
 
+		int curCount = 0;
 		while (peekToken().val != ";" && peekToken().val != ")" && peekToken().val != ":") {
-			if (currentToken.type != Identifier && currentToken.val != ",") {
+			if (currentToken.type != Identifier && currentToken.val != "," && peekToken().type != Identifier) {
 				break;
 			}
+
+			if (curCount++ == limit) return listOfIDs;
+			if (currentToken.type == Identifier) listOfIDs.push_back(currentToken);
 			consumeToken();
 		}
+
+		if (currentToken.type == Identifier) listOfIDs.push_back(currentToken);
+		return listOfIDs;
 	}
 
 	void StatementList() {
@@ -507,12 +558,20 @@ public:
 		consumeToken();
 		if (currentToken.val == "(") {
 			consumeToken();
-			IDs();
+
+			std::list<Token> stuffToScan = IDs();
+
 			consumeToken();
 			if (currentToken.val == ")") {
 				consumeToken();
 				if (currentToken.val == ";") {
 					consumeToken();
+
+					for (std::list<Token>::iterator it = stuffToScan.begin(); it != stuffToScan.end(); it++) {
+						Token token = *it;
+						instructions << "STDIN" << endl;
+						instructions << "POPM " << getSymbolByName(token.val).memoryLocation << " // " << token.val << endl;
+					}
 				}
 				else
 				{
@@ -530,8 +589,6 @@ public:
 			cout << "Expected '(' " << currentToken.val << endl;
 			exit(-1);
 		}
-
-
 	}
 
 	void While() {

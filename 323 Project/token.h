@@ -28,4 +28,9 @@ struct Token {
 	int intVal;
 };
 
+struct Symbol {
+	string idName;
+	int memoryLocation;
+};
+
 #endif
