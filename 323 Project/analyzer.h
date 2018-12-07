@@ -64,13 +64,19 @@ class Analyzer
 public:
 	ofstream instructions;
 	std::map<string, Symbol> symbolTable;
+	int instructionCount;
 
-	Analyzer() {
+	Analyzer() : instructionCount(0) {
 		instructions.open("instructions.txt");
 		if (instructions.is_open() == false) {
 			cout << "Error opening instructions file for output." << endl;
 			exit(errno);
 		}
+	}
+
+	int printInstruction(std::string instruction, std::string parameter = "") {
+		instructions << instructionCount << " " << instruction << " " << parameter << endl;
+		return instructionCount++;
 	}
 
 	//analyzer() {}
@@ -325,6 +331,7 @@ public:
 		}
 
 		if (currentToken.type == Identifier) listOfIDs.push_back(currentToken);
+		if (currentToken.val == ";") deconsumeToken();
 		return listOfIDs;
 	}
 
@@ -432,6 +439,8 @@ public:
 			exit(-1);
 		}
 
+		Token id = currentToken;
+
 		consumeToken();
 		if (currentToken.val != "=") {
 			cout << "Expected = got " << currentToken.val;
@@ -439,6 +448,7 @@ public:
 		}
 
 		Expression();
+		printInstruction("POPM", std::to_string(getSymbolByName(id.val).memoryLocation));
 
 		consumeToken();
 		if (currentToken.val != ";") {
@@ -534,6 +544,8 @@ public:
 
 		Expression();
 
+		printInstruction("STDOUT");
+
 		consumeToken();
 		if (currentToken.val != ")") {
 			cout << "Expected a ), got " << currentToken.val << endl;
@@ -550,43 +562,36 @@ public:
 	void Scan() {
 		if (syntaxSwitch) cout << "\t<Scan> ::=    get ( <IDs> );";
 
+
+		if (syntaxSwitch) cout << "\t<Print> ::=    put ( <Expression>);" << endl;
+
 		if (currentToken.val != "get") {
 			cout << "Expected keyword get, got " << currentToken.val << endl;
 			exit(-1);
 		}
 
 		consumeToken();
-		if (currentToken.val == "(") {
-			consumeToken();
-
-			std::list<Token> stuffToScan = IDs();
-
-			consumeToken();
-			if (currentToken.val == ")") {
-				consumeToken();
-				if (currentToken.val == ";") {
-					consumeToken();
-
-					for (std::list<Token>::iterator it = stuffToScan.begin(); it != stuffToScan.end(); it++) {
-						Token token = *it;
-						instructions << "STDIN" << endl;
-						instructions << "POPM " << getSymbolByName(token.val).memoryLocation << " // " << token.val << endl;
-					}
-				}
-				else
-				{
-					cout << "Expected ';', got " << currentToken.val << endl;
-					exit(-1);
-				}
-			}
-			else {
-				cout << "Expected ')', got " << currentToken.val << endl;
-				exit(-1);
-			}
-
+		if (currentToken.val != "(") {
+			cout << "Expected a (, got " << currentToken.val << endl;
+			exit(-1);
 		}
-		else {
-			cout << "Expected '(' " << currentToken.val << endl;
+
+		std::list<Token> stuffToScan = IDs();
+		for (std::list<Token>::iterator it = stuffToScan.begin(); it != stuffToScan.end(); it++) {
+			Token token = *it;
+			printInstruction("STDIN");
+			printInstruction("POPM", std::to_string(getSymbolByName(token.val).memoryLocation));
+		}
+
+		consumeToken();
+		if (currentToken.val != ")") {
+			cout << "Expected a ), got " << currentToken.val << endl;
+			exit(-1);
+		}
+
+		consumeToken();
+		if (currentToken.type != Separator && currentToken.val != ";") {
+			cout << "Expected a ; got a " << currentToken.val << endl;
 			exit(-1);
 		}
 	}
@@ -645,17 +650,45 @@ public:
 		 * Once we're in an expression, we only accept <Primary>'s
 		 */
 
+		std::list<Token> expressionTokens;
+
 		if (syntaxSwitch) cout << "\t<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>" << endl;
 
 		int tokensConsumed = 1;
 		while (currentToken.val != ")" && currentToken.val != ";" && !isRelop(currentToken.val)) {
+
+			// Check if current token is not an operator
+			// Check if next token is an operator
+			// Check if next + 1 token is not an operator
+
+			// If previous conditions are met, consume all three tokens 
+			// and create an operation
+
+			expressionTokens.push_back(currentToken);
 			consumeToken();
 			tokensConsumed++;
 		}
 
-		if (tokensConsumed == 0) {
+		if (expressionTokens.size() == 0) {
 			cout << "Expected an expression got " << currentToken.val << endl;
 			exit(-1);
+		}
+		else if (expressionTokens.size() == 1) {
+			// Ex: "a" or "1"
+			//     put(a) or put(1)
+
+			Token toPrint = expressionTokens.front();
+			if (toPrint.type != Identifier) {
+				printInstruction("PUSHI", toPrint.val);
+			}
+			else {
+				printInstruction("PUSHM", std::to_string(getSymbolByName(toPrint.val).memoryLocation));
+			}
+		}
+		else if (expressionTokens.size() % 2 != 0) { // Cannot have an expression with even number of tokens
+			// Ex: "a + b" or "a + 1 - c"
+
+
 		}
 
 		if (peekPrevToken().val == "(" && currentToken.val == ")") {
