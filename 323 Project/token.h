@@ -36,4 +36,10 @@ struct Symbol {
 	int memoryLocation;
 };
 
+struct Instruction {
+	string instruction;
+	string parameter;
+	string lineNumber;
+};
+
 #endif

@@ -68,7 +68,10 @@ public:
 	std::map<string, Symbol> symbolTable;
 	int instructionCount;
 
-	Analyzer() : instructionCount(0) {
+	bool bufferInstructions;
+	std::vector<Instruction> instructionBuffer;
+
+	Analyzer() : instructionCount(1), bufferInstructions(false) {
 		instructions.open("instructions.txt");
 		if (instructions.is_open() == false) {
 			cout << "Error opening instructions file for output." << endl;
@@ -76,9 +79,24 @@ public:
 		}
 	}
 
-	int printInstruction(std::string instruction, std::string parameter = "") {
-		instructions << instructionCount << " " << instruction << " " << parameter << endl;
-		return instructionCount++;
+	void enableInstructionBuffer(bool state)  {
+		bufferInstructions = state;
+		instructionBuffer.empty();
+	}
+
+	void printInstructionBuffer() {
+		enableInstructionBuffer(false);
+		for (auto instruction : instructionBuffer) {
+			printInstruction(instruction.instruction, instruction.parameter);
+		}
+	}
+
+	void printInstruction(std::string instruction, std::string parameter = "") {
+		if (bufferInstructions) {
+			instructionBuffer.push_back(Instruction{instruction, parameter});
+		} else {
+			instructions << instructionCount++ << " " << instruction << " " << parameter << endl;
+		}
 	}
 
 	void printSymbolTable() {		
@@ -643,14 +661,8 @@ public:
 
 		Condition();
 
-		// TODO needs to be replaced with the location
-		// of the below JUMP instruction. It might be
-		// easier to just store instructions in a list
-		// and print them out afterwards. That way, we
-		// can insert instructions between other
-		// instructions. Line numbers will happen when
-		// we print out everything maybe. Idk.
-		printInstruction("JUMPZ", "TODO");
+		enableInstructionBuffer(true);
+		printInstruction("JUMPZ", "??");	// First item in buffer
 
 		consumeToken();
 		if (currentToken.val != ")") {
@@ -659,6 +671,10 @@ public:
 		}
 
 		Statement();
+
+		enableInstructionBuffer(false);
+		instructionBuffer[0].parameter = to_string(instructionCount + instructionBuffer.size() + 1);
+		printInstructionBuffer();
 
 		printInstruction("JUMP", to_string(jumpLoc));
 	}
