@@ -102,8 +102,8 @@ public:
 			{"<", "LES"},
 			{"=", "EQU"},
 			{"!=", "NEQ"},
-			{">=", "GEQ"},
-			{"<=", "LEQ"},
+			{"=>", "GEQ"},
+			{"=<", "LEQ"},
 		};
 
 		return mapping[op];
@@ -675,12 +675,26 @@ public:
 
 	Token Relop() {
 		consumeToken();
-		if (currentToken.val == "==" || currentToken.val == "^=" || currentToken.val == ">" ||
-			currentToken.val == "<" || currentToken.val == "=>" || currentToken.val == "=<") {
+		if (currentToken.val == ">" || currentToken.val == "<") {
 			if (syntaxSwitch) cout << "\t<Relop> ::= == | ^= | > | < | => | =<" << endl;
 			return currentToken;
-		}
-		else {
+		} else if (currentToken.val == "=" && peekToken().val == "=") {
+			if (syntaxSwitch) cout << "\t<Relop> ::= == | ^= | > | < | => | =<" << endl;
+			consumeToken();
+			return Token{Operator, "=="};
+		} else if (currentToken.val == "^" && peekToken().val == "=") {
+			if (syntaxSwitch) cout << "\t<Relop> ::= == | ^= | > | < | => | =<" << endl;
+			consumeToken();
+			return Token{Operator, "^="};
+		} else if (currentToken.val == "=" && peekToken().val == ">") {
+			if (syntaxSwitch) cout << "\t<Relop> ::= == | ^= | > | < | => | =<" << endl;
+			consumeToken();
+			return Token{Operator, "=>"};
+		} else if (currentToken.val == "=" && peekToken().val == "<") {
+			if (syntaxSwitch) cout << "\t<Relop> ::= == | ^= | > | < | => | =<" << endl;
+			consumeToken();
+			return Token{Operator, "=<"};
+		} else {
 			cout << "Expected a relop" << endl;
 			exit(-1);
 		}
@@ -705,7 +719,7 @@ public:
 		if (syntaxSwitch) cout << "\t<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>" << endl;
 
 		int tokensConsumed = 1;
-		while (currentToken.val != ")" && currentToken.val != ";" && !isRelop(currentToken.val)) {
+		while (currentToken.val != ")" && currentToken.val != ";" && currentToken.val != "=" && !isRelop(currentToken.val)) {
 
 			// Check if current token is not an operator
 			// Check if next token is an operator

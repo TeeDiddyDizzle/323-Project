@@ -1,9 +1,16 @@
 %%
-     int    low,  high, step$;      ! declarations !
+int i, max, sum;
+sum = 0;
+i = 1;
+get ( max);
+while (i => max) {
+ sum = sum + i;
+ i = i + 1;
+}
+put (sum + max);
 
-     get (low, high, step$);
-     while (low + 1  <  high )  
-         {  put (low);
-             put (low);
-             low =  low  +  step$;
-         } 
+if (1 < 0) sum = max; endif
+
+if (i > max) max = sum; endif
+
+if (i =< sum) i = 2; endif

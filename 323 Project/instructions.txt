@@ -1,28 +1,45 @@
-0 STDIN 
-1 POPM 2000
-2 STDIN 
-3 POPM 2001
+0 PUSHI 0
+1 POPM 2002
+2 PUSHI 1
+3 POPM 2000
 4 STDIN 
-5 POPM 2002
+5 POPM 2001
 6 LABEL 
 7 PUSHM 2000
-8 PUSHI 1
-9 ADD 
-10 PUSHM 2001
-11 LES 
-12 JUMPZ TODO
-13 PUSHM 2000
-14 STDOUT 
+8 PUSHM 2001
+9 GEQ 
+10 JUMPZ TODO
+11 PUSHM 2002
+12 PUSHM 2000
+13 ADD 
+14 POPM 2002
 15 PUSHM 2000
-16 STDOUT 
-17 PUSHM 2000
-18 PUSHM 2002
-19 ADD 
-20 POPM 2000
-21 JUMP 6
+16 PUSHI 1
+17 ADD 
+18 POPM 2000
+19 JUMP 6
+20 PUSHM 2002
+21 PUSHM 2001
+22 ADD 
+23 STDOUT 
+24 PUSHI 1
+25 PUSHI 0
+26 LES 
+27 PUSHM 2001
+28 POPM 2002
+29 PUSHM 2000
+30 PUSHM 2001
+31 GRT 
+32 PUSHM 2002
+33 POPM 2001
+34 PUSHM 2000
+35 PUSHM 2002
+36 LEQ 
+37 PUSHI 2
+38 POPM 2000
 
  #### SYMBOL TABLE ####
      Identifier   Memory Location           Type
-           high           2001            int
-            low           2000            int
-          step$           2002            int
+              i           2000            int
+            max           2001            int
+            sum           2002            int
