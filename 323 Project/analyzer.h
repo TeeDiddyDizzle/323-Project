@@ -79,6 +79,24 @@ public:
 		return instructionCount++;
 	}
 
+	std::string opToInstruction(std::string op) {
+		std::map<string, string> mapping = {
+			{"+", "ADD"},
+			{"-", "SUB"},
+			{"*", "MUL"},
+			{"/", "DIV"},
+			{">", "GRT"},
+			{"<", "LES"},
+			{"<", "LES"},
+			{"=", "EQU"},
+			{"!=", "NEQ"},
+			{">=", "GEQ"},
+			{"<=", "LEQ"},
+		};
+
+		return mapping[op];
+	}
+
 	//analyzer() {}
 	void Rat18S() {
 		// Check for any function defs before the %% separator
@@ -711,7 +729,7 @@ public:
 						printInstruction("PUSHM", std::to_string(getSymbolByName(rhs.val).memoryLocation));
 					}
 
-					printInstruction("TODO", relop.val);
+					printInstruction(opToInstruction(relop.val));
 				}
 				else {
 					// Other iterations can use the result of the last operation 
@@ -727,7 +745,7 @@ public:
 						printInstruction("PUSHM", std::to_string(getSymbolByName(rhs.val).memoryLocation));
 					}
 
-					printInstruction("TODO", relop.val);
+					printInstruction(opToInstruction(relop.val));
 				}
 			}
 		}
