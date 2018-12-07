@@ -1,5 +1,7 @@
 #ifndef LANGUAGE_H
 #define LANGUAGE_H
+#include <algorithm>
+#include <iostream>
 #include <vector>
 #include "token.h"
 

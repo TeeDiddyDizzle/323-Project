@@ -3,6 +3,8 @@
 #ifndef ANALYZER_H
 #define ANALYZER_H
 
+#include <iomanip>
+#include <string>
 #include <iostream>
 #include <fstream>
 #include <map>
