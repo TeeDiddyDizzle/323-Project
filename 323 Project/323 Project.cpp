@@ -143,5 +143,6 @@ int main(int argc, char* argv[])
 		cout << "Error opening file." << endl;
 	}
 	analyze.Rat18S();
+	analyze.printSymbolTable();
 	system("pause");
 }

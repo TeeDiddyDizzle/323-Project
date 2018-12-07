@@ -16,6 +16,7 @@ using namespace std;
 
 int counter = 0;
 bool syntaxSwitch = true;
+bool done = false;
 
 vector<Token> tokenList;
 Token currentToken;
@@ -30,7 +31,7 @@ void consumeToken() {
 	}
 	else {
 		cout << "EOF" << endl;
-		exit(0);
+		done = true;
 	}
 }
 
@@ -45,7 +46,7 @@ Token peekToken() {
 	}
 	else {
 		cout << "EOF" << endl;
-		exit(0);
+		done = true;
 	}
 }
 
@@ -77,6 +78,16 @@ public:
 	int printInstruction(std::string instruction, std::string parameter = "") {
 		instructions << instructionCount << " " << instruction << " " << parameter << endl;
 		return instructionCount++;
+	}
+
+	void printSymbolTable() {		
+		instructions << endl << " #### SYMBOL TABLE ####" << endl;
+		instructions << setw(15) << "Identifier" << setw(15) << "   Memory Location" << setw(15) << "Type" << endl;
+		map<string, Symbol>::iterator it;
+		for (it = symbolTable.begin(); it != symbolTable.end(); it++) {
+			Symbol sym = it->second;
+			instructions << setw(15) << sym.idName << setw(15) << sym.memoryLocation << setw(15) << sym.type << endl;
+		}
 	}
 
 	std::string opToInstruction(std::string op) {
@@ -297,6 +308,8 @@ public:
 			exit(-1);
 		}
 
+		std::string symbolType = currentToken.val;
+
 		std::list<Token> listOfDeclarations = IDs();
 		int memoryLocation = 2000;
 
@@ -313,6 +326,7 @@ public:
 			Symbol newSymbol;
 			newSymbol.idName = potentialIdentifier.val;
 			newSymbol.memoryLocation = memoryLocation++;
+			newSymbol.type = symbolType;
 
 			symbolTable[newSymbol.idName] = newSymbol;
 		}
@@ -359,7 +373,7 @@ public:
 			cout << "\t<Statement> :: = <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>" << endl;
 		}
 
-		while (peekToken().val != "}") {
+		while (peekToken().val != "}" && !done) {
 			// TODO: If we hit the end of the file without finding }, that's an error.
 			Statement();
 			//consumeToken();

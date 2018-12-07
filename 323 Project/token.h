@@ -30,6 +30,7 @@ struct Token {
 
 struct Symbol {
 	string idName;
+	string type;
 	int memoryLocation;
 };
 

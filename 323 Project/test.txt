@@ -1,15 +1,13 @@
 %% 
 
-real total;
-real first, second;
+int zero, one, two;
 
-! call functions!
-get(first, second);
+zero = 0;
+one = 1;
+two = 2;
 
-put(first);
+two = zero / one;
+put(two);
 
-put(second);
-first = 1 + 2 - second * 3;
-get(first);
 
-put(four);
+
