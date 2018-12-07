@@ -688,7 +688,48 @@ public:
 		else if (expressionTokens.size() % 2 != 0) { // Cannot have an expression with even number of tokens
 			// Ex: "a + b" or "a + 1 - c"
 
+			std::list<Token>::iterator it;
+			int i;
+			for (it = expressionTokens.begin(), i = 0; it != expressionTokens.end(); it++, i++) {
+				if (i == 0) {
+					// First iteration needs to do one extra instruction
+					Token lhs = *it++;
+					Token relop = *it++;
+					Token rhs = *it;
 
+					if (lhs.type != Identifier) {
+						printInstruction("PUSHI", lhs.val);
+					}
+					else {
+						printInstruction("PUSHM", std::to_string(getSymbolByName(lhs.val).memoryLocation));
+					}
+
+					if (rhs.type != Identifier) {
+						printInstruction("PUSHI", rhs.val);
+					}
+					else {
+						printInstruction("PUSHM", std::to_string(getSymbolByName(rhs.val).memoryLocation));
+					}
+
+					printInstruction("TODO", relop.val);
+				}
+				else {
+					// Other iterations can use the result of the last operation 
+					// that is stored at the top of the stack
+
+					Token relop = *it++;
+					Token rhs = *it;
+
+					if (rhs.type != Identifier) {
+						printInstruction("PUSHI", rhs.val);
+					}
+					else {
+						printInstruction("PUSHM", std::to_string(getSymbolByName(rhs.val).memoryLocation));
+					}
+
+					printInstruction("TODO", relop.val);
+				}
+			}
 		}
 
 		if (peekPrevToken().val == "(" && currentToken.val == ")") {

@@ -9,7 +9,7 @@ get(first, second);
 put(first);
 
 put(second);
-first = 1;
+first = 1 + 2 - second * 3;
 get(first);
 
 put(four);
