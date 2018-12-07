@@ -2,7 +2,7 @@
      int    low,  high, step$;      ! declarations !
 
      get (low, high, step$);
-     while (low  <  high )  
+     while (low + 1  <  high )  
          {  put (low);
              put (low);
              low =  low  +  step$;

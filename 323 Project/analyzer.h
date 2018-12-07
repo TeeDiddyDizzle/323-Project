@@ -10,11 +10,10 @@
 #include <map>
 #include <list>
 
-using namespace std;
-
 #include <vector>
 #include "token.h"
 
+using namespace std;
 
 int counter = 0;
 bool syntaxSwitch = true;
@@ -639,7 +638,19 @@ public:
 			exit(-1);
 		}
 
+		int jumpLoc = instructionCount;
+		printInstruction("LABEL");
+
 		Condition();
+
+		// TODO needs to be replaced with the location
+		// of the below JUMP instruction. It might be
+		// easier to just store instructions in a list
+		// and print them out afterwards. That way, we
+		// can insert instructions between other
+		// instructions. Line numbers will happen when
+		// we print out everything maybe. Idk.
+		printInstruction("JUMPZ", "TODO");
 
 		consumeToken();
 		if (currentToken.val != ")") {
@@ -648,21 +659,26 @@ public:
 		}
 
 		Statement();
+
+		printInstruction("JUMP", to_string(jumpLoc));
 	}
 
 	void Condition() {
 		Expression();
-		Relop();
+		Token op = Relop();
 		Expression();
+
+		printInstruction(opToInstruction(op.val));
 
 		if (syntaxSwitch) cout << "\t<Condition> ::= <Expression> <Relop> <Expression>" << endl;
 	}
 
-	void Relop() {
+	Token Relop() {
 		consumeToken();
 		if (currentToken.val == "==" || currentToken.val == "^=" || currentToken.val == ">" ||
 			currentToken.val == "<" || currentToken.val == "=>" || currentToken.val == "=<") {
 			if (syntaxSwitch) cout << "\t<Relop> ::= == | ^= | > | < | => | =<" << endl;
+			return currentToken;
 		}
 		else {
 			cout << "Expected a relop" << endl;
