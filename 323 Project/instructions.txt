@@ -1,0 +1,22 @@
+0 STDIN 
+1 POPM 2000
+2 STDIN 
+3 POPM 2001
+4 STDIN 
+5 POPM 2002
+6 PUSHM 2000
+7 PUSHM 2001
+8 PUSHM 2000
+9 STDOUT 
+10 PUSHM 2000
+11 STDOUT 
+12 PUSHM 2000
+13 PUSHM 2002
+14 ADD 
+15 POPM 2000
+
+ #### SYMBOL TABLE ####
+     Identifier   Memory Location           Type
+           high           2001            int
+            low           2000            int
+          step$           2002            int

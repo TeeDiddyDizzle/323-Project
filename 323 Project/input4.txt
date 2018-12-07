@@ -1,0 +1,7 @@
+function convert$ [a:int, b:int, c:boolean] {
+    return a*b*c;
+}
+
+%%
+
+put(convert$())

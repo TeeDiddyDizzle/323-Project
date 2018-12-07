@@ -1,13 +1,9 @@
-%% 
+%%
+     int    low,  high, step$;      ! declarations !
 
-int zero, one, two;
-
-zero = 0;
-one = 1;
-two = 2;
-
-two = zero / one;
-put(two);
-
-
-
+     get (low, high, step$);
+     while (low  <  high )  
+         {  put (low);
+             put (low);
+             low =  low  +  step$;
+         } 

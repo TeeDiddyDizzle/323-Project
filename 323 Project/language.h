@@ -1,5 +1,6 @@
 #ifndef LANGUAGE_H
 #define LANGUAGE_H
+#include <string>
 #include <algorithm>
 #include <iostream>
 #include <vector>
