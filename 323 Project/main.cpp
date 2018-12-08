@@ -1,9 +1,4 @@
 ﻿// 323 Project.cpp : This file contains the 'main' function. Program execution begins and ends there
-
-#ifndef LINUX
-#include "pch.h"
-#endif
-
 #include <iostream>
 #include <iomanip>
 #include <string>
