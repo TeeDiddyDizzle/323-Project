@@ -1,0 +1,49 @@
+%%
+
+int i, max,sum; 
+boolean alpha, omega;
+int air,water,earth,fire,energy;
+int one, two, three;
+
+sum = 0; 
+i = 1; 
+
+alpha = omega;
+omega = alpha;
+
+omega = true;
+
+
+get ( max);
+while (i < max) 
+	{ 
+	sum = sum + i;
+	i = i + 1; 
+	}
+ put (sum + max); 
+ if (i < max)
+ { sum = (sum + i);} 
+ else { i = i + 1; } 
+ endif
+ 
+water = 1;
+if (water == 1)
+		alpha = true;
+		endif
+
+ get(one, two, three);
+ put (i + sum);
+fire = 0;
+	earth = 0;
+	while  (fire < earth)   
+		energy = 23;
+	
+
+
+	water = 13 + 33;
+	fire = 256 - 250;
+	
+	if(fire < water)
+		fire =0;
+		endif
+	

@@ -19,6 +19,7 @@ int counter = 0;
 bool syntaxSwitch = true;
 bool done = false;
 
+int memoryLocation = 2000;
 vector<Token> tokenList;
 Token currentToken;
 
@@ -335,7 +336,7 @@ public:
 		std::string symbolType = currentToken.val;
 
 		std::list<Token> listOfDeclarations = IDs();
-		int memoryLocation = 2000;
+		
 
 		for (std::list<Token>::iterator it = listOfDeclarations.begin(); it != listOfDeclarations.end(); it++) {
 			Token potentialIdentifier = *it;
