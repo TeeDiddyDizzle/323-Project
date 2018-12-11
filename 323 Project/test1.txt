@@ -1,0 +1,6 @@
+%%
+int alpha, bravo;
+boolean one;
+int echo, foxtrot, golf;
+get(alpha, bravo, one, echo, foxtrot, golf);
+put (alpha + bravo);

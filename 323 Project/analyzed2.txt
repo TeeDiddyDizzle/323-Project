@@ -1,0 +1,142 @@
+          Token         Lexeme
+
+Separator           %%
+	<Opt Function Definitions> ::= <Empty>
+	<Empty>   ::= 
+	<Rat18S>  ::=   <Opt Function Definitions>   %%  <Opt Declaration List>  <Statement List> 
+	<Opt Declaration List> ::= <Declaration List> | <Empty>
+	<Declaration List>  : = <Declaration>; | <Declaration>; <Declaration List>
+
+Keyword             int
+	<Declaration> ::=   <Qualifier > <IDs>
+	<Qualifier> ::= int | boolean | real 
+
+Identifier          i
+	<IDs> ::=     <Identifier>    | <Identifier>, <IDs>
+
+Separator           ,
+
+Identifier          max
+
+Separator           ,
+
+Identifier          sum
+
+Separator           ;
+	<Statement List> ::=   <Statement>   | <Statement> <Statement List>
+	<Statement> :: = <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>
+
+Identifier          sum
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Integer             0
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           ;
+
+Separator           ;
+
+Identifier          i
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Integer             1
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           ;
+
+Separator           ;
+
+Keyword             get
+	<Scan> ::=    get ( <IDs> );	<Print> ::=    put ( <Expression>);
+
+Separator           (
+
+Identifier          max
+	<IDs> ::=     <Identifier>    | <Identifier>, <IDs>
+
+Separator           )
+
+Separator           ;
+
+Keyword             while
+	<While> ::=  while ( <Condition> )  <Statement>
+
+Separator           (
+
+Identifier          i
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            <
+
+Operator            <
+	<Relop> ::= == | ^= | > | < | => | =<
+
+Identifier          max
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           )
+	<Condition> ::= <Expression> <Relop> <Expression>
+
+Separator           )
+
+Separator           {
+<Compound>  ::=	{ <Statement List>> } 
+	<Statement List> ::=   <Statement>   | <Statement> <Statement List>
+	<Statement> :: = <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>
+
+Identifier          sum
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Identifier          sum
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            +
+
+Identifier          i
+
+Separator           ;
+
+Separator           ;
+
+Identifier          i
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Identifier          i
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            +
+
+Integer             1
+
+Separator           ;
+
+Separator           ;
+
+Separator           }
+
+Keyword             put
+	<Print> ::=    put ( <Expression>);
+
+Separator           (
+
+Identifier          sum
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            +
+
+Identifier          max
+
+Separator           )
+
+Separator           )
+
+Separator           ;
+EOF

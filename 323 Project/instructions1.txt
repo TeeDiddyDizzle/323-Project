@@ -1,0 +1,25 @@
+1 STDIN 
+2 POPM 2000
+3 STDIN 
+4 POPM 2001
+5 STDIN 
+6 POPM 2002
+7 STDIN 
+8 POPM 2003
+9 STDIN 
+10 POPM 2004
+11 STDIN 
+12 POPM 2005
+13 PUSHM 2000
+14 PUSHM 2001
+15 ADD 
+16 STDOUT 
+
+ #### SYMBOL TABLE ####
+     Identifier   Memory Location           Type
+          alpha           2000            int
+          bravo           2001            int
+           echo           2003            int
+        foxtrot           2004            int
+           golf           2005            int
+            one           2002        boolean

@@ -1,9 +1,0 @@
-! Test case with less than 10 lines !
-function doSomeMath$ [] {
-	return 5 + 10 - 20 * 30 + 33.3 - 20.0;
-}
-%%
-int num1$, num2$;
-while (num < 20) {
-	num = num + doSomeMath();
-}

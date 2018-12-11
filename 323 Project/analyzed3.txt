@@ -1,0 +1,541 @@
+          Token         Lexeme
+
+Separator           %%
+	<Opt Function Definitions> ::= <Empty>
+	<Empty>   ::= 
+	<Rat18S>  ::=   <Opt Function Definitions>   %%  <Opt Declaration List>  <Statement List> 
+	<Opt Declaration List> ::= <Declaration List> | <Empty>
+	<Declaration List>  : = <Declaration>; | <Declaration>; <Declaration List>
+
+Keyword             int
+	<Declaration> ::=   <Qualifier > <IDs>
+	<Qualifier> ::= int | boolean | real 
+
+Identifier          i
+	<IDs> ::=     <Identifier>    | <Identifier>, <IDs>
+
+Separator           ,
+
+Identifier          max
+
+Separator           ,
+
+Identifier          sum
+
+Separator           ;
+
+Keyword             boolean
+	<Declaration> ::=   <Qualifier > <IDs>
+	<Qualifier> ::= int | boolean | real 
+
+Identifier          alpha
+	<IDs> ::=     <Identifier>    | <Identifier>, <IDs>
+
+Separator           ,
+
+Identifier          omega
+
+Separator           ;
+
+Keyword             int
+	<Declaration> ::=   <Qualifier > <IDs>
+	<Qualifier> ::= int | boolean | real 
+
+Identifier          air
+	<IDs> ::=     <Identifier>    | <Identifier>, <IDs>
+
+Separator           ,
+
+Identifier          water
+
+Separator           ,
+
+Identifier          earth
+
+Separator           ,
+
+Identifier          fire
+
+Separator           ,
+
+Identifier          energy
+
+Separator           ,
+
+Identifier          wind
+
+Separator           ;
+
+Keyword             int
+	<Declaration> ::=   <Qualifier > <IDs>
+	<Qualifier> ::= int | boolean | real 
+
+Identifier          one
+	<IDs> ::=     <Identifier>    | <Identifier>, <IDs>
+
+Separator           ,
+
+Identifier          two
+
+Separator           ,
+
+Identifier          three
+
+Separator           ;
+	<Statement List> ::=   <Statement>   | <Statement> <Statement List>
+	<Statement> :: = <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>
+
+Identifier          sum
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Integer             0
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           ;
+
+Separator           ;
+
+Identifier          i
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Integer             1
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           ;
+
+Separator           ;
+
+Identifier          alpha
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Identifier          omega
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           ;
+
+Separator           ;
+
+Identifier          omega
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Identifier          alpha
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           ;
+
+Separator           ;
+
+Identifier          omega
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Keyword             true
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           ;
+
+Separator           ;
+
+Keyword             get
+	<Scan> ::=    get ( <IDs> );	<Print> ::=    put ( <Expression>);
+
+Separator           (
+
+Identifier          max
+	<IDs> ::=     <Identifier>    | <Identifier>, <IDs>
+
+Separator           )
+
+Separator           ;
+
+Keyword             while
+	<While> ::=  while ( <Condition> )  <Statement>
+
+Separator           (
+
+Identifier          i
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            <
+
+Operator            <
+	<Relop> ::= == | ^= | > | < | => | =<
+
+Identifier          max
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           )
+	<Condition> ::= <Expression> <Relop> <Expression>
+
+Separator           )
+
+Separator           {
+<Compound>  ::=	{ <Statement List>> } 
+	<Statement List> ::=   <Statement>   | <Statement> <Statement List>
+	<Statement> :: = <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>
+
+Identifier          sum
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Identifier          sum
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            +
+
+Identifier          i
+
+Separator           ;
+
+Separator           ;
+
+Identifier          i
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Identifier          i
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            +
+
+Integer             1
+
+Separator           ;
+
+Separator           ;
+
+Separator           }
+
+Keyword             put
+	<Print> ::=    put ( <Expression>);
+
+Separator           (
+
+Identifier          sum
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            +
+
+Identifier          max
+
+Separator           )
+
+Separator           )
+
+Separator           ;
+
+Keyword             if
+	<If> ::= if ( <Condition> ) <Statement> endif | 
+	if (<Condition>) < Statement > else <Statement> endif
+
+Separator           (
+
+Identifier          i
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            <
+
+Operator            <
+	<Relop> ::= == | ^= | > | < | => | =<
+
+Identifier          max
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           )
+	<Condition> ::= <Expression> <Relop> <Expression>
+
+Separator           )
+
+Separator           {
+<Compound>  ::=	{ <Statement List>> } 
+	<Statement List> ::=   <Statement>   | <Statement> <Statement List>
+	<Statement> :: = <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>
+
+Identifier          sum
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Identifier          sum
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            +
+
+Identifier          i
+
+Separator           ;
+
+Separator           ;
+
+Separator           }
+
+Keyword             else
+
+Separator           {
+<Compound>  ::=	{ <Statement List>> } 
+	<Statement List> ::=   <Statement>   | <Statement> <Statement List>
+	<Statement> :: = <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>
+
+Identifier          i
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Identifier          i
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            +
+
+Integer             1
+
+Separator           ;
+
+Separator           ;
+
+Separator           }
+
+Keyword             endif
+	<If> ::= if  ( <Condition>  ) <Statement>   else  <Statement>  endif
+
+Identifier          water
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Integer             1
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           ;
+
+Separator           ;
+
+Keyword             if
+	<If> ::= if ( <Condition> ) <Statement> endif | 
+	if (<Condition>) < Statement > else <Statement> endif
+
+Separator           (
+
+Identifier          water
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            =
+
+Operator            =
+	<Relop> ::= == | ^= | > | < | => | =<
+
+Operator            =
+
+Integer             1
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           )
+	<Condition> ::= <Expression> <Relop> <Expression>
+
+Separator           )
+
+Identifier          alpha
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Keyword             true
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           ;
+
+Separator           ;
+
+Keyword             endif
+	<If> ::= if  ( <Condition>  ) <Statement>   endif
+
+Keyword             get
+	<Scan> ::=    get ( <IDs> );	<Print> ::=    put ( <Expression>);
+
+Separator           (
+
+Identifier          one
+	<IDs> ::=     <Identifier>    | <Identifier>, <IDs>
+
+Separator           ,
+
+Identifier          two
+
+Separator           ,
+
+Identifier          three
+
+Separator           )
+
+Separator           ;
+
+Keyword             put
+	<Print> ::=    put ( <Expression>);
+
+Separator           (
+
+Identifier          i
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            +
+
+Identifier          sum
+
+Separator           )
+
+Separator           )
+
+Separator           ;
+
+Identifier          fire
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Integer             0
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           ;
+
+Separator           ;
+
+Identifier          wind
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Integer             0
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           ;
+
+Separator           ;
+
+Keyword             while
+	<While> ::=  while ( <Condition> )  <Statement>
+
+Separator           (
+
+Identifier          fire
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            <
+
+Operator            <
+	<Relop> ::= == | ^= | > | < | => | =<
+
+Identifier          wind
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           )
+	<Condition> ::= <Expression> <Relop> <Expression>
+
+Separator           )
+
+Identifier          energy
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Integer             23
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           ;
+
+Separator           ;
+
+Identifier          water
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Integer             13
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            +
+
+Integer             33
+
+Separator           ;
+
+Separator           ;
+
+Identifier          fire
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Integer             256
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            -
+
+Integer             6
+
+Separator           ;
+
+Separator           ;
+
+Identifier          energy
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Identifier          fire
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            /
+
+Integer             2
+
+Separator           ;
+
+Separator           ;
+
+Keyword             if
+	<If> ::= if ( <Condition> ) <Statement> endif | 
+	if (<Condition>) < Statement > else <Statement> endif
+
+Separator           (
+
+Identifier          fire
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            <
+
+Operator            <
+	<Relop> ::= == | ^= | > | < | => | =<
+
+Identifier          water
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           )
+	<Condition> ::= <Expression> <Relop> <Expression>
+
+Separator           )
+
+Identifier          fire
+<Assign> ::= <Identifier> = <Expression> ;
+
+Operator            =
+
+Integer             0
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Separator           ;
+
+Separator           ;
+
+Keyword             endif
+	<If> ::= if  ( <Condition>  ) <Statement>   endif
+EOF

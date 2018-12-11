@@ -1,0 +1,100 @@
+          Token         Lexeme
+
+Separator           %%
+	<Opt Function Definitions> ::= <Empty>
+	<Empty>   ::= 
+	<Rat18S>  ::=   <Opt Function Definitions>   %%  <Opt Declaration List>  <Statement List> 
+	<Opt Declaration List> ::= <Declaration List> | <Empty>
+	<Declaration List>  : = <Declaration>; | <Declaration>; <Declaration List>
+
+Keyword             int
+	<Declaration> ::=   <Qualifier > <IDs>
+	<Qualifier> ::= int | boolean | real 
+
+Identifier          alpha
+	<IDs> ::=     <Identifier>    | <Identifier>, <IDs>
+
+Separator           ,
+
+Identifier          bravo
+
+Separator           ;
+
+Keyword             boolean
+	<Declaration> ::=   <Qualifier > <IDs>
+	<Qualifier> ::= int | boolean | real 
+
+Identifier          one
+	<IDs> ::=     <Identifier>    | <Identifier>, <IDs>
+
+Separator           ;
+
+Keyword             int
+	<Declaration> ::=   <Qualifier > <IDs>
+	<Qualifier> ::= int | boolean | real 
+
+Identifier          echo
+	<IDs> ::=     <Identifier>    | <Identifier>, <IDs>
+
+Separator           ,
+
+Identifier          foxtrot
+
+Separator           ,
+
+Identifier          golf
+
+Separator           ;
+	<Statement List> ::=   <Statement>   | <Statement> <Statement List>
+	<Statement> :: = <Compound> | <Assign> | <If> | <Return> | <Print> | <Scan> | <While>
+
+Keyword             get
+	<Scan> ::=    get ( <IDs> );	<Print> ::=    put ( <Expression>);
+
+Separator           (
+
+Identifier          alpha
+	<IDs> ::=     <Identifier>    | <Identifier>, <IDs>
+
+Separator           ,
+
+Identifier          bravo
+
+Separator           ,
+
+Identifier          one
+
+Separator           ,
+
+Identifier          echo
+
+Separator           ,
+
+Identifier          foxtrot
+
+Separator           ,
+
+Identifier          golf
+
+Separator           )
+
+Separator           ;
+
+Keyword             put
+	<Print> ::=    put ( <Expression>);
+
+Separator           (
+
+Identifier          alpha
+	<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>
+
+Operator            +
+
+Identifier          bravo
+
+Separator           )
+
+Separator           )
+
+Separator           ;
+EOF
