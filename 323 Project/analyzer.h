@@ -799,7 +799,7 @@ public:
 			expressionTokens.push_back(currentToken);
 			consumeToken();
 
-			if (currentToken.val != "+" && currentToken.val != "-" && currentToken.val != "(" && currentToken.val != ")" && currentToken.val != ";" && currentToken.val != "=" && !isRelop(currentToken.val)) {
+			if (currentToken.val != "+" && currentToken.val != "-" && currentToken.val != "*" && currentToken.val != "/" && currentToken.val != "(" && currentToken.val != ")" && currentToken.val != ";" && currentToken.val != "=" && !isRelop(currentToken.val)) {
 				if (currentToken.type != Integer && currentToken.type != Real && currentToken.type != Identifier) {
 					cout << "Expected a factor or expression got: " << currentToken.val << endl;
 					exit(-1);
