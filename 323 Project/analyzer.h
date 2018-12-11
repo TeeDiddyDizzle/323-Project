@@ -80,8 +80,8 @@ public:
 	}
 
 	void enableInstructionBuffer(bool state)  {
+		if (state) instructionBuffer.clear();
 		bufferInstructions = state;
-		instructionBuffer.empty();
 	}
 
 	void printInstructionBuffer() {
@@ -520,6 +520,7 @@ public:
 		Condition();
 
 		enableInstructionBuffer(true);
+		printInstruction("JUMPZ", "??");
 
 		consumeToken();
 		if (currentToken.val != ")") {
@@ -529,16 +530,19 @@ public:
 
 		Statement();
 
-		enableInstructionBuffer(false);
-		instructionBuffer[0].parameter = to_string(instructionCount + instructionBuffer.size() + 1);
-		printInstructionBuffer();
-
 		consumeToken();
 		if (currentToken.val == "else") {
+			enableInstructionBuffer(false);
+			instructionBuffer[0].parameter = to_string(instructionCount + instructionBuffer.size() + 1);
+			printInstructionBuffer();
+
+			enableInstructionBuffer(true);
+			printInstruction("JUMP", "??");
+
 			Statement();
 
 			enableInstructionBuffer(false);
-			instructionBuffer[0].parameter = to_string(instructionCount + instructionBuffer.size() + 1);
+			instructionBuffer[0].parameter = to_string(instructionCount + instructionBuffer.size());
 			printInstructionBuffer();
 
 			consumeToken();
@@ -552,6 +556,12 @@ public:
 		}
 		else if (currentToken.val == "endif") {
 			if (syntaxSwitch) cout << "\t<If> ::= if  ( <Condition>  ) <Statement>   endif" << endl;
+
+			// In this case, set the jump instruction for the condition
+			// to jump after our last instruction in the buffer
+			enableInstructionBuffer(false);
+			instructionBuffer[0].parameter = to_string(instructionCount + instructionBuffer.size());
+			printInstructionBuffer();
 		}
 		else {
 			cout << "If expected else or endif but got " << currentToken.val << endl;
