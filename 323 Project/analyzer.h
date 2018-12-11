@@ -68,6 +68,7 @@ public:
 	std::map<string, Symbol> symbolTable;
 	int instructionCount;
 
+
 	bool bufferInstructions;
 	std::vector<Instruction> instructionBuffer;
 
@@ -77,6 +78,10 @@ public:
 			cout << "Error opening instructions file for output." << endl;
 			exit(errno);
 		}
+	}
+
+	void emptyInstructionBuffer() {
+		instructionBuffer.clear();
 	}
 
 	void enableInstructionBuffer(bool state)  {
@@ -516,10 +521,13 @@ public:
 			cout << "If expected a ( but got " << currentToken.val << endl;
 			exit(-1);
 		}
+		int jumpLoc = 0;
 
 		Condition();
 
+		emptyInstructionBuffer();
 		enableInstructionBuffer(true);
+		printInstruction("JUMPZ", "??");	// First item in buffer
 
 		consumeToken();
 		if (currentToken.val != ")") {
@@ -530,16 +538,28 @@ public:
 		Statement();
 
 		enableInstructionBuffer(false);
-		instructionBuffer[0].parameter = to_string(instructionCount + instructionBuffer.size() + 1);
+		instructionBuffer[0].parameter = to_string(instructionCount + instructionBuffer.size() + 2);
 		printInstructionBuffer();
+
+		printInstruction("JUMP", to_string(Else()));
+		printInstructionBuffer();
+
+
+	}
+
+	int Else() {
 
 		consumeToken();
 		if (currentToken.val == "else") {
+
+			printInstruction("LABEL");
+
+			emptyInstructionBuffer();
+			enableInstructionBuffer(true);
 			Statement();
 
 			enableInstructionBuffer(false);
 			instructionBuffer[0].parameter = to_string(instructionCount + instructionBuffer.size() + 1);
-			printInstructionBuffer();
 
 			consumeToken();
 			if (currentToken.val == "endif") {
@@ -557,6 +577,7 @@ public:
 			cout << "If expected else or endif but got " << currentToken.val << endl;
 			exit(-1);
 		}
+		return (instructionCount + instructionBuffer.size() + 1);
 	}
 
 	void Return() {
