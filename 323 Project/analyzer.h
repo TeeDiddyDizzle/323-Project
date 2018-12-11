@@ -519,6 +519,8 @@ public:
 
 		Condition();
 
+		enableInstructionBuffer(true);
+
 		consumeToken();
 		if (currentToken.val != ")") {
 			cout << "If expected a ) but got " << currentToken.val << endl;
@@ -527,9 +529,17 @@ public:
 
 		Statement();
 
+		enableInstructionBuffer(false);
+		instructionBuffer[0].parameter = to_string(instructionCount + instructionBuffer.size() + 1);
+		printInstructionBuffer();
+
 		consumeToken();
 		if (currentToken.val == "else") {
 			Statement();
+
+			enableInstructionBuffer(false);
+			instructionBuffer[0].parameter = to_string(instructionCount + instructionBuffer.size() + 1);
+			printInstructionBuffer();
 
 			consumeToken();
 			if (currentToken.val == "endif") {
@@ -733,10 +743,14 @@ public:
 		std::list<Token> expressionTokens;
 
 		if (syntaxSwitch) cout << "\t<Expression> ::= <Expression> + <Term> | <Expression> - <Term> | <Term>" << endl;
+		
+		int parenCount = -1;
+		if (currentToken.val == "(") {
+			parenCount = 1;
+		}
 
 		int tokensConsumed = 1;
 		while (currentToken.val != ")" && currentToken.val != ";" && currentToken.val != "=" && !isRelop(currentToken.val)) {
-
 			// Check if current token is not an operator
 			// Check if next token is an operator
 			// Check if next + 1 token is not an operator
@@ -747,6 +761,13 @@ public:
 			expressionTokens.push_back(currentToken);
 			consumeToken();
 			tokensConsumed++;
+
+			if (currentToken.val == "(") {
+				parenCount++;
+			}
+			else if (currentToken.val == ")") {
+				parenCount--;
+			}
 		}
 
 		if (expressionTokens.size() == 0) {
@@ -814,6 +835,10 @@ public:
 
 		if (peekPrevToken().val == "(" && currentToken.val == ")") {
 			// Functional call with no params
+		}
+		else if (parenCount == 0) {
+			// Exit expression if parenCount is 0 meaning the expression was contained in parenthesis and there was the correct amount of parenthesis.
+			// If it wasn't contained in parenthesis, then parenCount would stay -1
 		}
 		else {
 			deconsumeToken();
