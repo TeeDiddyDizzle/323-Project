@@ -123,7 +123,7 @@ public:
 			{">", "GRT"},
 			{"<", "LES"},
 			{"<", "LES"},
-			{"=", "EQU"},
+			{"==", "EQU"},
 			{"!=", "NEQ"},
 			{"=>", "GEQ"},
 			{"=<", "LEQ"},
@@ -536,13 +536,28 @@ public:
 		}
 
 		Statement();
-
 		enableInstructionBuffer(false);
-		instructionBuffer[0].parameter = to_string(instructionCount + instructionBuffer.size() + 2);
-		printInstructionBuffer();
 
-		printInstruction("JUMP", to_string(Else()));
-		printInstructionBuffer();
+		
+		if (peekToken().val == "else") {
+			instructionBuffer[0].parameter = to_string(instructionCount + instructionBuffer.size() + 2);
+			printInstructionBuffer();
+			printInstruction("JUMP", to_string(Else()));
+			printInstructionBuffer();
+		}
+		else {
+			instructionBuffer[0].parameter = to_string(instructionCount + instructionBuffer.size());
+			printInstructionBuffer();
+			consumeToken();
+			if (currentToken.val == "endif") {
+				if (syntaxSwitch) cout << "\t<If> ::= if  ( <Condition>  ) <Statement>   endif" << endl;
+			}
+			else {
+				cout << "If expected else or endif but got " << currentToken.val << endl;
+				exit(-1);
+			}		
+		}
+		
 
 
 	}
@@ -781,6 +796,14 @@ public:
 
 			expressionTokens.push_back(currentToken);
 			consumeToken();
+
+			if (currentToken.val != "+" && currentToken.val != "-" && currentToken.val != "(" && currentToken.val != ")" && currentToken.val != ";" && currentToken.val != "=" && !isRelop(currentToken.val)) {
+				if (currentToken.type != Integer && currentToken.type != Real && currentToken.type != Identifier) {
+					cout << "Expected a factor or expression got: " << currentToken.val << endl;
+					exit(-1);
+				}
+			}
+
 			tokensConsumed++;
 
 			if (currentToken.val == "(") {
