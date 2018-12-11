@@ -19,6 +19,7 @@ int counter = 0;
 bool syntaxSwitch = true;
 bool done = false;
 
+int memoryLocation = 2000;
 vector<Token> tokenList;
 Token currentToken;
 
@@ -68,6 +69,7 @@ public:
 	std::map<string, Symbol> symbolTable;
 	int instructionCount;
 
+
 	bool bufferInstructions;
 	std::vector<Instruction> instructionBuffer;
 
@@ -77,6 +79,10 @@ public:
 			cout << "Error opening instructions file for output." << endl;
 			exit(errno);
 		}
+	}
+
+	void emptyInstructionBuffer() {
+		instructionBuffer.clear();
 	}
 
 	void enableInstructionBuffer(bool state)  {
@@ -118,7 +124,7 @@ public:
 			{">", "GRT"},
 			{"<", "LES"},
 			{"<", "LES"},
-			{"=", "EQU"},
+			{"==", "EQU"},
 			{"!=", "NEQ"},
 			{"=>", "GEQ"},
 			{"=<", "LEQ"},
@@ -330,7 +336,7 @@ public:
 		std::string symbolType = currentToken.val;
 
 		std::list<Token> listOfDeclarations = IDs();
-		int memoryLocation = 2000;
+		
 
 		for (std::list<Token>::iterator it = listOfDeclarations.begin(); it != listOfDeclarations.end(); it++) {
 			Token potentialIdentifier = *it;
@@ -516,11 +522,13 @@ public:
 			cout << "If expected a ( but got " << currentToken.val << endl;
 			exit(-1);
 		}
+		int jumpLoc = 0;
 
 		Condition();
 
+		emptyInstructionBuffer();
 		enableInstructionBuffer(true);
-		printInstruction("JUMPZ", "??");
+		printInstruction("JUMPZ", "??");	// First item in buffer
 
 		consumeToken();
 		if (currentToken.val != ")") {
@@ -529,21 +537,40 @@ public:
 		}
 
 		Statement();
-
-		consumeToken();
-		if (currentToken.val == "else") {
-			enableInstructionBuffer(false);
+		
+		enableInstructionBuffer(false);
+		if (peekToken().val == "else") {
 			instructionBuffer[0].parameter = to_string(instructionCount + instructionBuffer.size() + 1);
 			printInstructionBuffer();
 
-			enableInstructionBuffer(true);
-			printInstruction("JUMP", "??");
-
-			Statement();
-
-			enableInstructionBuffer(false);
+			printInstruction("JUMP", to_string(Else()));
+			printInstruction("LABEL");
+			printInstructionBuffer();
+		}
+		else {
 			instructionBuffer[0].parameter = to_string(instructionCount + instructionBuffer.size());
 			printInstructionBuffer();
+			consumeToken();
+			if (currentToken.val == "endif") {
+				if (syntaxSwitch) cout << "\t<If> ::= if  ( <Condition>  ) <Statement>   endif" << endl;
+			}
+			else {
+				cout << "If expected else or endif but got " << currentToken.val << endl;
+				exit(-1);
+			}		
+		}
+		
+
+
+	}
+
+	int Else() {
+
+		consumeToken();
+		if (currentToken.val == "else") {
+			enableInstructionBuffer(true);
+			Statement();
+			enableInstructionBuffer(false);
 
 			consumeToken();
 			if (currentToken.val == "endif") {
@@ -567,6 +594,7 @@ public:
 			cout << "If expected else or endif but got " << currentToken.val << endl;
 			exit(-1);
 		}
+		return (instructionCount + instructionBuffer.size() + 2);
 	}
 
 	void Return() {
@@ -770,6 +798,14 @@ public:
 
 			expressionTokens.push_back(currentToken);
 			consumeToken();
+
+			if (currentToken.val != "+" && currentToken.val != "-" && currentToken.val != "(" && currentToken.val != ")" && currentToken.val != ";" && currentToken.val != "=" && !isRelop(currentToken.val)) {
+				if (currentToken.type != Integer && currentToken.type != Real && currentToken.type != Identifier) {
+					cout << "Expected a factor or expression got: " << currentToken.val << endl;
+					exit(-1);
+				}
+			}
+
 			tokensConsumed++;
 
 			if (currentToken.val == "(") {
@@ -790,7 +826,12 @@ public:
 
 			Token toPrint = expressionTokens.front();
 			if (toPrint.type != Identifier) {
-				printInstruction("PUSHI", toPrint.val);
+				if (toPrint.val == "true" || toPrint.val == "false") {
+					printInstruction("PUSHI", to_string(toPrint.val == "true" ? 1 : 0));
+				}
+				else {
+					printInstruction("PUSHI", toPrint.val);
+				}
 			}
 			else {
 				printInstruction("PUSHM", std::to_string(getSymbolByName(toPrint.val).memoryLocation));
